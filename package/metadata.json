@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "user@archlinux.org",
+                "Name": "Arch Linux Customizer"
+            }
+        ],
+        "Category": "Application Launchers",
+        "Description": "Windows 11 Fluent Liquid Glass Start Menu for KDE Plasma 6",
+        "Icon": "start-here-archlinux",
+        "Id": "org.kde.plasma.win11startmenu",
+        "License": "GPL-3.0+",
+        "Name": "Windows 11 Start Menu",
+        "Version": "1.0.0",
+        "Website": "https://archlinux.org"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-Provides": [
+        "org.kde.plasma.launchermenu"
+    ]
+}

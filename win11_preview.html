@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows 11 Start Menu - Arch Linux KDE Plasma</title>
+  <style>
+    :root {
+      /* Liquid Glass Dark Mode */
+      --glass-bg-dark: rgba(22, 26, 36, 0.45);
+      --glass-sidebar-dark: rgba(14, 17, 24, 0.45);
+      --glass-border-dark: rgba(255, 255, 255, 0.16);
+      --text-dark: #ffffff;
+      --text-muted-dark: #a2abbd;
+      --card-hover-dark: rgba(255, 255, 255, 0.1);
+
+      /* Liquid Glass Light Mode */
+      --glass-bg-light: rgba(255, 255, 255, 0.55);
+      --glass-sidebar-light: rgba(240, 243, 248, 0.5);
+      --glass-border-light: rgba(255, 255, 255, 0.6);
+      --text-light: #16181f;
+      --text-muted-light: #525866;
+      --card-hover-light: rgba(255, 255, 255, 0.85);
+
+      --accent: #0084ff;
+      --accent-section: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.42);
+    }
+
+    body.light ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    body.light ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+    }
+
+    body.light * {
+      scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(at 10% 20%, rgba(29, 78, 216, 0.55) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(14, 165, 233, 0.45) 0px, transparent 50%),
+        radial-gradient(at 80% 80%, rgba(99, 102, 241, 0.55) 0px, transparent 50%),
+        radial-gradient(at 20% 90%, rgba(16, 185, 129, 0.35) 0px, transparent 50%),
+        #0a0e17;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      padding: 12px 24px;
+      background: rgba(15, 20, 30, 0.35);
+      backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .badge-arch {
+      background: rgba(56, 189, 248, 0.25);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    .badge-kde {
+      background: rgba(0, 132, 255, 0.25);
+      color: #60a5fa;
+      border: 1px solid rgba(0, 132, 255, 0.4);
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .ctrl-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Start Menu Container */
+    .start-menu-container {
+      position: absolute;
+      bottom: 53px;
+      left: calc(50% + 10px);
+      transform: translateX(-50%) translateY(14px);
+      width: 820px;
+      height: 700px;
+      border-radius: 18px;
+      backdrop-filter: blur(50px) saturate(220%);
+      -webkit-backdrop-filter: blur(50px) saturate(220%);
+      box-shadow: 0 35px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px var(--glass-border-dark),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.11s cubic-bezier(0.1, 0.9, 0.2, 1), transform 0.11s cubic-bezier(0.1, 0.9, 0.2, 1);
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .start-menu-container.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .start-menu-container.left-aligned {
+      left: 50px;
+      transform: translateX(0) translateY(15px) scale(0.97);
+    }
+
+    .start-menu-container.left-aligned.open {
+      transform: translateX(0) translateY(0);
+    }
+
+    body.dark .start-menu-container {
+      background: var(--glass-bg-dark);
+      color: var(--text-dark);
+    }
+
+    body.light .start-menu-container {
+      background: var(--glass-bg-light);
+      color: var(--text-light);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.18),
+        0 0 0 1px var(--glass-border-light),
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* Windows 11 Context Menu */
+    .win11-context-menu {
+      position: fixed;
+      display: none;
+      z-index: 1000;
+      width: 200px;
+      background: rgba(30, 36, 48, 0.94);
+      backdrop-filter: blur(40px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      padding: 6px;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 12px;
+    }
+
+    .ctx-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      transition: background 0.12s;
+    }
+
+    .ctx-item:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .ctx-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 4px 0;
+    }
+
+    /* Search Bar */
+    .search-box-wrap {
+      padding: 24px 34px 12px 34px;
+    }
+
+    .search-box {
+      width: 100%;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 12px;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      border-bottom: 2px solid var(--accent);
+      transition: all 0.2s ease;
+    }
+
+    .search-box:focus-within {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), 0 0 20px rgba(0, 132, 255, 0.3);
+    }
+
+    body.light .search-box {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .search-box img {
+      width: 18px;
+      height: 18px;
+      opacity: 0.85;
+      filter: invert(1);
+    }
+
+    body.light .search-box img {
+      filter: none;
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+      color: inherit;
+    }
+
+    /* Two-Section Split */
+    .menu-main-split {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* LEFT SECTION: Pinned & Recommended */
+    .left-section {
+      flex: 1.25;
+      padding: 10px 24px 12px 34px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.light .left-section {
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .all-apps-btn {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .all-apps-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .pinned-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px 6px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      border: 1px solid transparent;
+    }
+
+    .app-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    body.light .app-item:hover {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .app-icon-img {
+      width: 58px;
+      height: 58px;
+      margin-bottom: 6px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .app-title {
+      font-size: 11.5px;
+      max-width: 80px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: inherit;
+      font-weight: 500;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 13px;
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .chip:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .chip.active {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .app-row-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .app-row-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* RIGHT SECTION: EXACT UNIFIED BACKGROUND AND OPACITY */
+    .right-section {
+      width: 180px;
+      min-width: 180px;
+      background: transparent;
+      padding: 10px 10px 12px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scrollbar-gutter: stable;
+    }
+
+    body.light .right-section {
+      background: transparent;
+    }
+
+    .category-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--accent-section);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tools-single-column {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tool-tile-single {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    /* Yalnız və yalnız mouse üzərində olarkən (hover) ağ şüşə parıltısı aktiv olur */
+    .tool-tile-single:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    }
+
+    /* Kursor çəkilən kimi (focus/active qalmasın deyə) dərhal sıfırlansın */
+    .tool-tile-single:focus,
+    .tool-tile-single:active {
+      outline: none;
+    }
+
+    body.light .tool-tile-single:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(255, 255, 255, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    /* System Symbolic Line Icon Style (Photo 2) */
+    .tool-symbolic-img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: invert(1);
+      opacity: 0.9;
+    }
+
+    body.light .tool-symbolic-img {
+      filter: none;
+      opacity: 0.85;
+    }
+
+    .tool-text {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .tool-name {
+      font-size: 11.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .tool-desc {
+      font-size: 9.5px;
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      margin-top: 1px;
+    }
+
+    /* Bottom Profile Panel */
+    .menu-footer {
+      height: 62px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(25px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 34px;
+    }
+
+    body.light .menu-footer {
+      background: rgba(255, 255, 255, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 5px 12px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .user-profile:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    body.light .user-profile:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .avatar-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0084ff, #00f2fe);
+      padding: 4px;
+    }
+
+    .power-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .power-btn:hover {
+      background: rgba(255, 68, 68, 0.2);
+      border-color: rgba(255, 68, 68, 0.4);
+    }
+
+    .power-btn img {
+      width: 18px;
+      height: 18px;
+      filter: invert(1);
+    }
+
+    body.light .power-btn img {
+      filter: none;
+    }
+
+    /* Taskbar */
+    .taskbar {
+      height: 48px;
+      background: rgba(14, 18, 26, 0.4);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+      z-index: 60;
+    }
+
+    body.light .taskbar {
+      background: rgba(255, 255, 255, 0.55);
+      border-top: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .taskbar-center {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      position: absolute;
+      left: calc(50% + 10px);
+      transform: translateX(-50%);
+    }
+
+    .taskbar.left-mode .taskbar-center {
+      position: static;
+      transform: none;
+    }
+
+    .taskbar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .taskbar-icon:hover {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      transform: translateY(-2px);
+    }
+
+    body.light .taskbar-icon:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .taskbar-icon img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .taskbar-tray {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: white;
+      font-size: 13px;
+    }
+
+    body.light .taskbar-tray {
+      color: #16181f;
+    }
+
+    .tray-icon {
+      width: 16px;
+      height: 16px;
+      filter: invert(1);
+      opacity: 0.85;
+    }
+
+    body.light .tray-icon {
+      filter: none;
+    }
+  </style>
+</head>
+
+<body class="dark">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="title-group">
+      <img src="icons/arch.svg" alt="Arch" style="width: 24px; height: 24px;">
+      <strong style="font-size: 15px;">Arch Linux KDE Plasma 6 - Windows 11 Fluent Menu</strong>
+      <span class="badge badge-kde">KDE Plasma 6.8</span>
+      <span class="badge badge-arch">Arch Linux</span>
+    </div>
+
+    <div class="controls-group">
+      <button class="ctrl-btn" onclick="toggleAlign()">
+        Alignment: <span id="align-text" style="font-weight: 600;">Center</span>
+      </button>
+      <button class="ctrl-btn" onclick="toggleTheme()">
+        Theme: <span id="theme-text" style="font-weight: 600;">Dark</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Start Menu -->
+  <div class="start-menu-container open" id="start-menu">
+    <!-- Search Bar -->
+    <div class="search-box-wrap">
+      <div class="search-box">
+        <img src="icons/search.svg" alt="Search">
+        <input type="text" id="searchInputPreview" placeholder="Type here to search apps, files and settings...">
+      </div>
+    </div>
+
+    <!-- Main Content Split -->
+    <div class="menu-main-split">
+
+      <!-- LEFT: Pinned Applications & Recommended Files -->
+      <div class="left-section" id="leftSection">
+        <!-- ALL APPS VIEW (Hidden by default, shown when All Apps > is clicked) -->
+        <div id="allAppsView" style="display: none; flex-direction: column; gap: 10px; height: 100%;">
+          <div class="section-header">
+            <span>All Applications</span>
+            <button class="all-apps-btn" onclick="toggleAllApps(false)">&lt; Back</button>
+          </div>
+          <!-- Linux Categories Chips -->
+          <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;" id="catChipsContainer">
+            <button class="chip active" onclick="filterCat('All', this)">All</button>
+            <button class="chip" onclick="filterCat('Development', this)">Development</button>
+            <button class="chip" onclick="filterCat('Internet', this)">Internet</button>
+            <button class="chip" onclick="filterCat('Multimedia', this)">Multimedia</button>
+            <button class="chip" onclick="filterCat('System', this)">System</button>
+            <button class="chip" onclick="filterCat('Utilities', this)">Utilities</button>
+            <button class="chip" onclick="filterCat('Settings', this)">Settings</button>
+          </div>
+          <!-- All Apps List Container -->
+          <div id="allAppsList"
+            style="display: flex; flex-direction: column; gap: 3px; overflow-y: auto; flex: 1; padding-right: 4px;">
+            <!-- Generated dynamically or listed -->
+            <div class="app-row-item" data-cat="Utilities"><img src="icons/package.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Ark</div>
+                <div style="font-size: 10px; opacity: 0.6;">Archiving Tool • Utilities</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Internet"><img src="icons/arch.svg" style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Brave Web Browser</div>
+                <div style="font-size: 10px; opacity: 0.6;">Fast & Secure Browser • Internet</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Development"><img src="icons/editor.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">CMake</div>
+                <div style="font-size: 10px; opacity: 0.6;">Build System • Development</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Internet"><img src="icons/discord.png"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Discord</div>
+                <div style="font-size: 10px; opacity: 0.6;">Voice & Text Chat • Internet</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/discover.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Discover</div>
+                <div style="font-size: 10px; opacity: 0.6;">Software Center • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/dolphin.svg" style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Dolphin</div>
+                <div style="font-size: 10px; opacity: 0.6;">File Manager • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/htop.svg" style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Htop</div>
+                <div style="font-size: 10px; opacity: 0.6;">Process Viewer • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/sys_about.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Info Center</div>
+                <div style="font-size: 10px; opacity: 0.6;">System Information • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Settings"><img src="icons/settings.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">KDE System Settings</div>
+                <div style="font-size: 10px; opacity: 0.6;">Configuration • Settings</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/kitty.svg" style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Kitty</div>
+                <div style="font-size: 10px; opacity: 0.6;">Terminal Emulator • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/konsole.svg" style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Konsole</div>
+                <div style="font-size: 10px; opacity: 0.6;">KDE Terminal • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Utilities"><img src="icons/krunner.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Rofi Application Launcher</div>
+                <div style="font-size: 10px; opacity: 0.6;">Window switcher & app launcher • Utilities</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Utilities"><img src="icons/spectacle.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Spectacle</div>
+                <div style="font-size: 10px; opacity: 0.6;">Screenshot Utility • Utilities</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="System"><img src="icons/system_monitor.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">System Monitor</div>
+                <div style="font-size: 10px; opacity: 0.6;">Processes & Sensors • System</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Development"><img src="icons/editor.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">Visual Studio Code</div>
+                <div style="font-size: 10px; opacity: 0.6;">Code Editing • Development</div>
+              </div>
+            </div>
+            <div class="app-row-item" data-cat="Multimedia"><img src="icons/sys_vids.svg"
+                style="width: 22px; height: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500;">VLC Media Player</div>
+                <div style="font-size: 10px; opacity: 0.6;">Media Player • Multimedia</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEFAULT PINNED & RECOMMENDED VIEW -->
+        <div id="defaultPinnedView">
+          <div class="section-header">
+            <span>Pinned</span>
+            <button class="all-apps-btn" onclick="toggleAllApps(true)">All Apps &gt;</button>
+          </div>
+
+          <div class="pinned-grid" style="margin-top: 14px;">
+            <div class="app-item">
+              <img src="icons/dolphin.svg" class="app-icon-img" alt="Dolphin">
+              <span class="app-title">Dolphin</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/konsole.svg" class="app-icon-img" alt="Konsole">
+              <span class="app-title">Konsole</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/kitty.svg" class="app-icon-img" alt="Kitty">
+              <span class="app-title">Kitty</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/settings.svg" class="app-icon-img" alt="Settings">
+              <span class="app-title">Settings</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/discover.svg" class="app-icon-img" alt="Discover">
+              <span class="app-title">Discover</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/arch.svg" class="app-icon-img" alt="Brave">
+              <span class="app-title">Brave</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/discord.png" class="app-icon-img" alt="Discord">
+              <span class="app-title">Discord</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/spectacle.svg" class="app-icon-img" alt="Spectacle">
+              <span class="app-title">Spectacle</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/calc.svg" class="app-icon-img" alt="KCalc">
+              <span class="app-title">Calculator</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/editor.svg" class="app-icon-img" alt="Kate">
+              <span class="app-title">Text Editor</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/kde.svg" class="app-icon-img" alt="KDE System">
+              <span class="app-title">About KDE</span>
+            </div>
+            <div class="app-item">
+              <img src="icons/arch.svg" class="app-icon-img" alt="System Monitor">
+              <span class="app-title">Monitor</span>
+            </div>
+            <!-- Row 3 (Extra Row appearing when More is clicked) -->
+            <div class="app-item extra-row" style="display: none;">
+              <img src="icons/editor.svg" class="app-icon-img" alt="VS Code">
+              <span class="app-title">VS Code</span>
+            </div>
+            <div class="app-item extra-row" style="display: none;">
+              <img src="icons/sys_vids.svg" class="app-icon-img" alt="VLC">
+              <span class="app-title">VLC Player</span>
+            </div>
+            <div class="app-item extra-row" style="display: none;">
+              <img src="icons/htop.svg" class="app-icon-img" alt="Htop">
+              <span class="app-title">Htop</span>
+            </div>
+            <div class="app-item extra-row" style="display: none;">
+              <img src="icons/package.svg" class="app-icon-img" alt="Ark">
+              <span class="app-title">Ark</span>
+            </div>
+            <div class="app-item extra-row" style="display: none;">
+              <img src="icons/krunner.svg" class="app-icon-img" alt="Rofi">
+              <span class="app-title">Rofi</span>
+            </div>
+            <div class="app-item extra-row" style="display: none;">
+              <img src="icons/sys_about.svg" class="app-icon-img" alt="Info Center">
+              <span class="app-title">Info Center</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommended Section (Real System User Data) -->
+        <div>
+          <div class="section-header">
+            <span>Recommended</span>
+            <button class="all-apps-btn" id="moreBtn" onclick="toggleMoreRows()">More &gt;</button>
+          </div>
+          <!-- Windows 11 App Context Menu -->
+          <div class="win11-context-menu" id="appContextMenu">
+            <div class="ctx-item" onclick="alert('Launching app...')"><span>▶</span> <span>Open</span></div>
+            <div class="ctx-divider"></div>
+            <div class="ctx-item" id="ctxPinStart" onclick="alert('Pinned/Unpinned from Start Menu')"><span>⭐</span>
+              <span id="ctxPinStartText">Pin to Start</span>
+            </div>
+            <div class="ctx-item" onclick="alert('Pinned to KDE Taskbar!')"><span>📌</span> <span>Pin to Taskbar</span>
+            </div>
+            <div class="ctx-item" onclick="alert('Desktop shortcut created on ~/Desktop!')"><span>🖥️</span> <span>Add
+                to Desktop</span></div>
+          </div>
+
+          <script>
+            let isMoreExpanded = false;
+            function toggleMoreRows() {
+              isMoreExpanded = !isMoreExpanded;
+              document.querySelectorAll('.extra-row').forEach(el => {
+                el.style.display = isMoreExpanded ? 'flex' : 'none';
+              });
+              document.getElementById('moreBtn').innerText = isMoreExpanded ? '< Less' : 'More >';
+            }
+          </script>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/sys_pics.svg" style="width: 24px; height: 24px;" alt="Image">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Screenshot-230544.png</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Pictures/Screenshots • Image</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/doc.svg" style="width: 24px; height: 24px;" alt="Text">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  proxy.txt</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Desktop/ops • Text Document</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/package.svg" style="width: 24px; height: 24px;" alt="Archive">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Antigravity IDE.tar.gz</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Downloads • Archive</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/editor.svg" style="width: 24px; height: 24px;" alt="Markdown">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  antigravity-skills.md</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Desktop/ops • Markdown</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/documents.svg" style="width: 24px; height: 24px;" alt="PDF">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Emil_Suleymanli_CV.pdf</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Desktop • PDF Document</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/package.svg" style="width: 24px; height: 24px;" alt="Exe">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  DiscordCanarySetup.exe</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Downloads • Executable</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/sys_pics.svg" style="width: 24px; height: 24px;" alt="Image">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Screenshot-225033.png</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Pictures/Screenshots • Image</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+              onmouseout="this.style.background='transparent'">
+              <img src="icons/script.svg" style="width: 24px; height: 24px;" alt="JSON">
+              <div style="overflow: hidden;">
+                <div
+                  style="font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  games.json</div>
+                <div
+                  style="font-size: 10px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Desktop • JSON Config</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: EXACT SYSTEM SYMBOLIC LINE ICONS (PHOTO 2 MATCH, NO EMOJIS, ENGLISH) -->
+    <div class="right-section">
+
+      <!-- Places & Folders -->
+      <div>
+        <div class="category-title">Places & Storage</div>
+        <div class="tools-single-column">
+          <div class="tool-tile-single">
+            <img src="icons/sys_home.svg" class="tool-symbolic-img" alt="Home">
+            <div class="tool-text">
+              <div class="tool-name">Home</div>
+              <div class="tool-desc">~/ (Personal Folder)</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/sys_docs.svg" class="tool-symbolic-img" alt="Documents">
+            <div class="tool-text">
+              <div class="tool-name">Documents</div>
+              <div class="tool-desc">~/Documents</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/sys_downloads.svg" class="tool-symbolic-img" alt="Downloads">
+            <div class="tool-text">
+              <div class="tool-name">Downloads</div>
+              <div class="tool-desc">~/Downloads</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/sys_pics.svg" class="tool-symbolic-img" alt="Pictures">
+            <div class="tool-text">
+              <div class="tool-name">Pictures</div>
+              <div class="tool-desc">~/Pictures</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/sys_music.svg" class="tool-symbolic-img" alt="Music">
+            <div class="tool-text">
+              <div class="tool-name">Music</div>
+              <div class="tool-desc">~/Music</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/sys_vids.svg" class="tool-symbolic-img" alt="Videos">
+            <div class="tool-text">
+              <div class="tool-name">Videos</div>
+              <div class="tool-desc">~/Videos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security & Analysis Tools -->
+      <div>
+        <div class="category-title">Security & Network</div>
+        <div class="tools-single-column">
+          <div class="tool-tile-single">
+            <img src="icons/security.svg" class="tool-symbolic-img" alt="Nmap">
+            <div class="tool-text">
+              <div class="tool-name">Nmap Scanner</div>
+              <div class="tool-desc">Network Recon</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/network_tool.svg" class="tool-symbolic-img" alt="Wireshark">
+            <div class="tool-text">
+              <div class="tool-name">Wireshark</div>
+              <div class="tool-desc">Packet Analysis</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/firewall.svg" class="tool-symbolic-img" alt="Burp">
+            <div class="tool-text">
+              <div class="tool-name">Burp Suite</div>
+              <div class="tool-desc">Web Security</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/terminal.svg" class="tool-symbolic-img" alt="Metasploit">
+            <div class="tool-text">
+              <div class="tool-name">Metasploit</div>
+              <div class="tool-desc">Exploit Framework</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Settings & Management -->
+      <div>
+        <div class="category-title">System & Tools</div>
+        <div class="tools-single-column">
+          <div class="tool-tile-single">
+            <img src="icons/sys_settings.svg" class="tool-symbolic-img" alt="Settings">
+            <div class="tool-text">
+              <div class="tool-name">System Settings</div>
+              <div class="tool-desc">Hardware & Display</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/sys_about.svg" class="tool-symbolic-img" alt="About">
+            <div class="tool-text">
+              <div class="tool-name">About System</div>
+              <div class="tool-desc">OS & Kernel Info</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/package.svg" class="tool-symbolic-img" alt="Pacman">
+            <div class="tool-text">
+              <div class="tool-name">Package Manager</div>
+              <div class="tool-desc">Pacman / AUR</div>
+            </div>
+          </div>
+          <div class="tool-tile-single">
+            <img src="icons/htop.svg" class="tool-symbolic-img" alt="Processes">
+            <div class="tool-text">
+              <div class="tool-name">Process Monitor</div>
+              <div class="tool-desc">Htop / Btop</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bottom Footer Profile -->
+  <div class="menu-footer">
+    <div class="user-profile">
+      <img src="icons/user.svg" class="avatar-img" alt="User">
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 13px; font-weight: 600;">sir</span>
+        <span style="font-size: 11px; opacity: 0.65;">Arch Linux KDE Plasma 6.8</span>
+      </div>
+    </div>
+    <div class="power-btn" title="Power Options">
+      <img src="icons/power.svg" alt="Power">
+    </div>
+  </div>
+  </div>
+
+  <!-- Taskbar -->
+  <div class="taskbar" id="taskbar">
+    <div style="width: 80px; display: flex; align-items: center; gap: 2px;">
+      <img src="icons/arch.svg" style="width: 20px; height: 20px;" alt="Arch">
+      <span style="font-size: 12px; font-weight: 600; opacity: 0.85;">Arch</span>
+    </div>
+
+    <div class="taskbar-center" id="taskbar-center">
+      <div class="taskbar-icon" onclick="toggleStartMenu()" title="Start">
+        <img src="icons/Arch_Linux__Crystal__icon.svg" style="width: 28px; height: 28px; object-fit: contain;"
+          alt="Arch Start">
+      </div>
+
+      <div class="taskbar-icon" title="Search">
+        <img src="icons/search.svg" style="width: 20px; filter: invert(1);" alt="Search">
+      </div>
+      <div class="taskbar-icon" title="Dolphin File Manager">
+        <img src="icons/dolphin.svg" alt="Dolphin">
+      </div>
+      <div class="taskbar-icon" title="Konsole">
+        <img src="icons/konsole.svg" alt="Konsole">
+      </div>
+      <div class="taskbar-icon" title="Kitty Terminal">
+        <img src="icons/kitty.svg" alt="Kitty">
+      </div>
+      <div class="taskbar-icon" title="Discord">
+        <img src="icons/discord.png" alt="Discord">
+      </div>
+      <div class="taskbar-icon" title="Settings">
+        <img src="icons/settings.svg" alt="Settings">
+      </div>
+      <div class="taskbar-icon" title="Discover">
+        <img src="icons/discover.svg" alt="Discover">
+      </div>
+    </div>
+
+    <div class="taskbar-tray">
+      <img src="icons/network.svg" class="tray-icon" alt="Network">
+      <img src="icons/volume.svg" class="tray-icon" alt="Volume">
+      <img src="icons/battery.svg" class="tray-icon" alt="Battery">
+      <div style="text-align: right; line-height: 1.2; font-size: 11px;">
+        <div id="tray-time">20:20</div>
+        <div id="tray-date">Nov 27, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Windows 11 App Context Menu -->
+  <div class="win11-context-menu" id="appContextMenu">
+    <div class="ctx-item" onclick="alert('Launching app...')"><span>▶</span> <span>Open</span></div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" id="ctxPinStart" onclick="alert('Pinned/Unpinned from Start Menu')"><span>⭐</span> <span
+        id="ctxPinStartText">Pin to Start</span></div>
+    <div class="ctx-item" onclick="alert('Pinned to KDE Taskbar!')"><span>📌</span> <span>Pin to Taskbar</span></div>
+    <div class="ctx-item" onclick="alert('Desktop shortcut created on ~/Desktop!')"><span>🖥️</span> <span>Add to
+        Desktop</span></div>
+  </div>
+
+  <script>
+    let isDark = true;
+    let isCenter = true;
+    const startMenu = document.getElementById('start-menu');
+    const taskbar = document.getElementById('taskbar');
+    const alignText = document.getElementById('align-text');
+    const themeText = document.getElementById('theme-text');
+
+    function toggleAllApps(show) {
+      document.getElementById('allAppsView').style.display = show ? 'flex' : 'none';
+      document.getElementById('defaultPinnedView').style.display = show ? 'none' : 'block';
+    }
+
+    function filterCat(cat, chipEl) {
+      document.querySelectorAll('#catChipsContainer .chip').forEach(c => c.classList.remove('active'));
+      chipEl.classList.add('active');
+      document.querySelectorAll('#allAppsList .app-row-item').forEach(row => {
+        if (cat === 'All' || row.getAttribute('data-cat') === cat) {
+          row.style.display = 'flex';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleStartMenu() {
+      const isOpen = startMenu.classList.toggle('open');
+      if (isOpen) {
+        setTimeout(() => {
+          const input = document.getElementById('searchInputPreview');
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        }, 50);
+      } else {
+        // Reset state back to normal Pinned view ONLY after closing animation completes (250ms)
+        setTimeout(() => {
+          if (!startMenu.classList.contains('open')) {
+            toggleAllApps(false);
+            filterCat('All', document.querySelector('#catChipsContainer .chip'));
+            const input = document.getElementById('searchInputPreview');
+            if (input) input.value = '';
+          }
+        }, 250);
+      }
+    }
+
+    // Direct typing anywhere while start menu is open routes straight to search
+    window.addEventListener('keydown', (e) => {
+      if (startMenu.classList.contains('open')) {
+        const input = document.getElementById('searchInputPreview');
+        if (input && document.activeElement !== input) {
+          if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            input.focus();
+          }
+        }
+      }
+    });
+
+    // Context menu logic
+    const ctxMenu = document.getElementById('appContextMenu');
+    document.addEventListener('contextmenu', (e) => {
+      const appEl = e.target.closest('.app-item, .app-row-item');
+      if (appEl && startMenu.contains(appEl)) {
+        e.preventDefault();
+        const isPinned = appEl.classList.contains('app-item');
+        document.getElementById('ctxPinStartText').textContent = isPinned ? 'Unpin from Start' : 'Pin to Start';
+        ctxMenu.style.display = 'flex';
+        ctxMenu.style.left = Math.min(e.clientX, window.innerWidth - 210) + 'px';
+        ctxMenu.style.top = Math.min(e.clientY, window.innerHeight - 180) + 'px';
+      } else {
+        ctxMenu.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('click', () => {
+      if (ctxMenu) ctxMenu.style.display = 'none';
+    });
+
+    // Drag and Drop reordering and dragging to Taskbar / Desktop
+    const pinnedGrid = document.querySelector('.pinned-grid');
+    let draggedApp = null;
+
+    document.querySelectorAll('.app-item').forEach(item => {
+      item.setAttribute('draggable', 'true');
+
+      item.addEventListener('dragstart', (e) => {
+        draggedApp = item;
+        item.style.opacity = '0.4';
+        item.style.transform = 'scale(0.95)';
+        e.dataTransfer.setData('text/plain', item.querySelector('.app-title').textContent);
+      });
+
+      item.addEventListener('dragend', () => {
+        if (draggedApp) {
+          draggedApp.style.opacity = '1';
+          draggedApp.style.transform = '';
+          draggedApp = null;
+        }
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedApp && draggedApp !== item) {
+          const children = Array.from(pinnedGrid.children);
+          const fromIndex = children.indexOf(draggedApp);
+          const toIndex = children.indexOf(item);
+          if (fromIndex < toIndex) {
+            pinnedGrid.insertBefore(draggedApp, item.nextSibling);
+          } else {
+            pinnedGrid.insertBefore(draggedApp, item);
+          }
+        }
+      });
+    });
+
+    // Allow dragging to taskbar in simulator
+    const taskbarCenter = document.querySelector('.taskbar-center');
+    if (taskbarCenter) {
+      taskbarCenter.addEventListener('dragover', (e) => e.preventDefault());
+      taskbarCenter.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const appName = e.dataTransfer.getData('text/plain');
+        if (appName) {
+          alert('"' + appName + '" taskbara sürüşdürülüb əlavə edildi!');
+        }
+      });
+    }
+
+    // Allow dragging to desktop background in simulator
+    document.body.addEventListener('dragover', (e) => e.preventDefault());
+    document.body.addEventListener('drop', (e) => {
+      const appName = e.dataTransfer.getData('text/plain');
+      if (appName && !startMenu.contains(e.target)) {
+        e.preventDefault();
+        alert('"' + appName + '" masaüstünə (~/Desktop) sürüşdürülüb əlavə edildi!');
+      }
+    });
+
+    function toggleAlign() {
+      isCenter = !isCenter;
+      if (isCenter) {
+        taskbar.classList.remove('left-mode');
+        startMenu.classList.remove('left-aligned');
+        alignText.textContent = "Center";
+      } else {
+        taskbar.classList.add('left-mode');
+        startMenu.classList.add('left-aligned');
+        alignText.textContent = "Left";
+      }
+    }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      if (isDark) {
+        document.body.classList.remove('light');
+        document.body.classList.add('dark');
+        themeText.textContent = "Dark";
+      } else {
+        document.body.classList.remove('dark');
+        document.body.classList.add('light');
+        themeText.textContent = "Light";
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('tray-time').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('tray-date').textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+
+</html>
