@@ -178,6 +178,8 @@ PlasmoidItem {
             property bool isClosing: false
 
             function resetState() {
+                if (typeof powerMenu !== "undefined" && powerMenu) powerMenu.dismiss();
+                if (typeof appContextMenu !== "undefined" && appContextMenu) appContextMenu.dismiss();
                 searchInput.text = "";
                 fullScope.showAllApps = false;
                 fullScope.showMorePinned = false;
@@ -197,6 +199,8 @@ PlasmoidItem {
             }
 
             function requestClose() {
+                if (typeof powerMenu !== "undefined" && powerMenu) powerMenu.dismiss();
+                if (typeof appContextMenu !== "undefined" && appContextMenu) appContextMenu.dismiss();
                 if (!visible || isClosing) return;
                 isClosing = true;
                 if (openAnim.running) openAnim.stop();
@@ -232,6 +236,8 @@ PlasmoidItem {
                     menuTranslate.y = 20;
                     openAnim.restart();
                 } else {
+                    if (typeof powerMenu !== "undefined" && powerMenu) powerMenu.dismiss();
+                    if (typeof appContextMenu !== "undefined" && appContextMenu) appContextMenu.dismiss();
                     openAnim.stop();
                     closeAnim.stop();
                     isClosing = false;
