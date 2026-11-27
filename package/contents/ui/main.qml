@@ -250,7 +250,7 @@ PlasmoidItem {
             property bool isClosing: false
 
             function resetState() {
-                if (typeof powerMenu !== "undefined" && powerMenu) powerMenu.dismiss();
+                if (typeof powerMenuCard !== "undefined" && powerMenuCard) powerMenuCard.closeMenu();
                 if (typeof appContextMenu !== "undefined" && appContextMenu) appContextMenu.dismiss();
                 searchInput.text = "";
                 fullScope.showAllApps = false;
@@ -273,7 +273,7 @@ PlasmoidItem {
             }
 
             function requestClose() {
-                if (typeof powerMenu !== "undefined" && powerMenu) powerMenu.dismiss();
+                if (typeof powerMenuCard !== "undefined" && powerMenuCard) powerMenuCard.closeMenu();
                 if (typeof appContextMenu !== "undefined" && appContextMenu) appContextMenu.dismiss();
                 if (!visible || isClosing) return;
                 isClosing = true;
@@ -321,7 +321,7 @@ PlasmoidItem {
                     menuTranslate.y = 20;
                     openAnim.restart();
                 } else {
-                    if (typeof powerMenu !== "undefined" && powerMenu) powerMenu.dismiss();
+                    if (typeof powerMenuCard !== "undefined" && powerMenuCard) powerMenuCard.closeMenu();
                     if (typeof appContextMenu !== "undefined" && appContextMenu) appContextMenu.dismiss();
                     openAnim.stop();
                     closeAnim.stop();
@@ -610,36 +610,6 @@ PlasmoidItem {
                                 root.addToDesktop(fullScope.contextTargetApp.name, fullScope.contextTargetApp.icon, fullScope.contextTargetApp.cmd, fullScope.contextTargetApp.desktop);
                             }
                         }
-                    }
-                }
-
-                // Power Options Menu
-                QQC2.Menu {
-                    id: powerMenu
-                    QQC2.MenuItem {
-                        text: "Lock Screen"
-                        icon.name: "system-lock-screen"
-                        onTriggered: root.launchCommand("loginctl lock-session")
-                    }
-                    QQC2.MenuItem {
-                        text: "Log Out"
-                        icon.name: "system-log-out"
-                        onTriggered: root.launchCommand("qdbus6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout")
-                    }
-                    QQC2.MenuItem {
-                        text: "Sleep (Suspend)"
-                        icon.name: "system-suspend"
-                        onTriggered: root.launchCommand("systemctl suspend")
-                    }
-                    QQC2.MenuItem {
-                        text: "Restart"
-                        icon.name: "system-reboot"
-                        onTriggered: root.launchCommand("systemctl reboot")
-                    }
-                    QQC2.MenuItem {
-                        text: "Shut Down"
-                        icon.name: "system-shutdown"
-                        onTriggered: root.launchCommand("systemctl poweroff")
                     }
                 }
 
@@ -1816,7 +1786,115 @@ PlasmoidItem {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
-                                            powerMenu.popup(powerBtnMouse, 0, -powerMenu.implicitHeight);
+                                            powerMenuCard.toggleMenu();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Click-outside overlay to dismiss power menu
+                    MouseArea {
+                        id: powerMenuDismissOverlay
+                        anchors.fill: parent
+                        visible: powerMenuCard.isOpen
+                        z: 99
+                        onClicked: powerMenuCard.closeMenu()
+                    }
+
+                    // Windows 11 Styled Power Menu Card (In-window, perfectly stable & aligned)
+                    Rectangle {
+                        id: powerMenuCard
+                        z: 100
+                        property bool isOpen: false
+
+                        function toggleMenu() {
+                            isOpen = !isOpen;
+                        }
+                        function closeMenu() {
+                            isOpen = false;
+                        }
+                        function openMenu() {
+                            isOpen = true;
+                        }
+
+                        visible: opacity > 0
+                        opacity: isOpen ? 1 : 0
+                        scale: isOpen ? 1 : 0.95
+                        transformOrigin: Item.BottomRight
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 120; easing.type: Easing.OutQuad }
+                        }
+                        Behavior on scale {
+                            NumberAnimation { duration: 120; easing.type: Easing.OutQuad }
+                        }
+
+                        anchors.right: parent.right
+                        anchors.rightMargin: 24
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 68
+
+                        width: 195
+                        height: powerMenuCol.implicitHeight + 16
+                        radius: 10
+                        color: Qt.rgba(0.12, 0.14, 0.18, 0.98)
+                        border.width: 1
+                        border.color: Qt.rgba(1, 1, 1, 0.16)
+
+                        ColumnLayout {
+                            id: powerMenuCol
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            spacing: 3
+
+                            Repeater {
+                                model: [
+                                    { text: "Lock Screen", icon: "system-lock-screen", cmd: "loginctl lock-session" },
+                                    { text: "Log Out", icon: "system-log-out", cmd: "qdbus6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout" },
+                                    { text: "Sleep (Suspend)", icon: "system-suspend", cmd: "systemctl suspend" },
+                                    { text: "Restart", icon: "system-reboot", cmd: "systemctl reboot" },
+                                    { text: "Shut Down", icon: "system-shutdown", cmd: "systemctl poweroff" }
+                                ]
+
+                                delegate: Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 34
+                                    radius: 6
+                                    color: itemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : "transparent"
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 10
+                                        anchors.rightMargin: 10
+                                        spacing: 12
+
+                                        Kirigami.Icon {
+                                            source: modelData.icon
+                                            Layout.preferredWidth: 16
+                                            Layout.preferredHeight: 16
+                                        }
+
+                                        Text {
+                                            text: modelData.text
+                                            color: "white"
+                                            font.pixelSize: 13
+                                            font.family: "Segoe UI"
+                                            Layout.fillWidth: true
+                                            elide: Text.ElideRight
+                                        }
+                                    }
+
+                                    MouseArea {
+                                        id: itemMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            powerMenuCard.closeMenu();
+                                            popDialog.requestClose();
+                                            root.launchCommand(modelData.cmd);
                                         }
                                     }
                                 }
