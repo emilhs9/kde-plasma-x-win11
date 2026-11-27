@@ -18,8 +18,8 @@ PlasmoidItem {
     compactRepresentation: compactRepresentation
     fullRepresentation: compactRepresentation
 
-    width: 820
-    height: 700
+    width: 850
+    height: 720
 
     KCoreAddons.KUser {
         id: kuser
@@ -125,6 +125,7 @@ PlasmoidItem {
         { name: "Videos", desc: "~/Videos", icon: "folder-videos-symbolic", path: "/home/sir/Videos" }
     ]
     property var sidebarCategories: (typeof ToolsDB !== "undefined" && ToolsDB.toolsDb && ToolsDB.toolsDb.categories) ? ToolsDB.toolsDb.categories : []
+    property var activityColumns: (typeof ToolsDB !== "undefined" && ToolsDB.toolsDb && ToolsDB.toolsDb.activity_columns) ? ToolsDB.toolsDb.activity_columns : []
 
     Plasma5Support.DataSource {
         id: toolsDataSource
@@ -141,6 +142,9 @@ PlasmoidItem {
                     }
                     if (parsed.categories && parsed.categories.length > 0) {
                         root.sidebarCategories = parsed.categories;
+                    }
+                    if (parsed.activity_columns && parsed.activity_columns.length > 0) {
+                        root.activityColumns = parsed.activity_columns;
                     }
                 } catch(e) {
                     console.log("Error parsing dynamic tools JSON:", e);
@@ -240,8 +244,8 @@ PlasmoidItem {
             hideOnWindowDeactivate: !fullScope.isDraggingAny
             backgroundHints: PlasmaCore.Dialog.NoBackground
 
-            width: 820
-            height: 700
+            width: 850
+            height: 720
 
             property bool isClosing: false
 
@@ -1321,9 +1325,9 @@ PlasmoidItem {
 
                                             delegate: Item {
                                                 id: pinDelegateRoot
-                                                visible: !model.extra || fullScope.showMorePinned
-                                                Layout.preferredWidth: 92
-                                                Layout.preferredHeight: 86
+                                                visible: true
+                                                Layout.preferredWidth: 94
+                                                Layout.preferredHeight: 74
 
                                                 property int itemIndex: index
                                                 property bool isDragging: dragArea.drag.active
@@ -1343,8 +1347,8 @@ PlasmoidItem {
 
                                                 Rectangle {
                                                     id: pinVisual
-                                                    width: 92
-                                                    height: 86
+                                                    width: 94
+                                                    height: 74
                                                     radius: 8
                                                     color: (dragArea.drag.active) ? Qt.rgba(0.2, 0.5, 0.9, 0.3) : (dragArea.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent")
                                                     border.color: (dragArea.drag.active) ? "#38bdf8" : (dragArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : "transparent")
@@ -1369,11 +1373,11 @@ PlasmoidItem {
 
                                                     ColumnLayout {
                                                         anchors.centerIn: parent
-                                                        spacing: 6
+                                                        spacing: 4
                                                         Kirigami.Icon {
                                                             source: model.icon
-                                                            Layout.preferredWidth: 50
-                                                            Layout.preferredHeight: 50
+                                                            Layout.preferredWidth: 38
+                                                            Layout.preferredHeight: 38
                                                             Layout.alignment: Qt.AlignHCenter
                                                         }
                                                         Text {
@@ -1426,106 +1430,114 @@ PlasmoidItem {
                                         }
                                     }
 
-                                    // Recommended Header
+                                    // Activity Section Header (More/Less button removed)
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Text {
-                                            text: "Recommended"
+                                            text: "Fəaliyyətlər və Girişlər"
                                             color: "white"
                                             font.pixelSize: 13
                                             font.weight: Font.DemiBold
                                         }
                                         Item { Layout.fillWidth: true }
-                                        Rectangle {
-                                            width: 72
-                                            height: 24
-                                            radius: 6
-                                            color: recMoreMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(1, 1, 1, 0.08)
-                                            border.color: Qt.rgba(1, 1, 1, 0.15)
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: fullScope.showMorePinned ? "< Less" : "More >"
-                                                color: "white"
-                                                font.pixelSize: 11
-                                            }
-                                            MouseArea {
-                                                id: recMoreMouse
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: fullScope.showMorePinned = !fullScope.showMorePinned
-                                            }
-                                        }
                                     }
 
-                                    // Recommended 2-Column Grid (Filled with Real User Files: Screenshots, Text, Downloads, PDFs, Notes)
-                                    GridLayout {
+                                    // 4-Column Activity Dashboard: Əməliyyatlar, Girilən Yerlər, Yüklənənlər, Açılanlar
+                                    RowLayout {
                                         Layout.fillWidth: true
-                                        columns: 2
-                                        columnSpacing: 10
-                                        rowSpacing: 4
+                                        spacing: 8
 
                                         Repeater {
-                                            model: [
-                                                { name: "Screenshot-230544.png", desc: "Pictures/Screenshots • Image", icon: "image-png", path: "/home/sir/Pictures/Screenshots/Screenshot-20261127-230544.png", extra: false },
-                                                { name: "proxy.txt", desc: "Desktop/ops • Text Document", icon: "text-plain", path: "/home/sir/Desktop/ops/proxy.txt", extra: false },
-                                                { name: "Antigravity IDE.tar.gz", desc: "Downloads • Archive", icon: "package-x-generic", path: "/home/sir/Downloads/Antigravity IDE.tar.gz", extra: false },
-                                                { name: "antigravity-skills.md", desc: "Desktop/ops • Markdown", icon: "text-markdown", path: "/home/sir/Desktop/ops/antigravity-skills.md", extra: false },
-                                                { name: "Emil_Suleymanli_CV.pdf", desc: "Desktop • PDF Document", icon: "application-pdf", path: "/home/sir/Desktop/Emil_Suleymanli_CV_EN.pdf", extra: true },
-                                                { name: "DiscordCanarySetup.exe", desc: "Downloads • Executable", icon: "application-x-ms-dos-executable", path: "/home/sir/Downloads/DiscordCanarySetup.exe", extra: true },
-                                                { name: "Screenshot-225033.png", desc: "Pictures/Screenshots • Image", icon: "image-png", path: "/home/sir/Pictures/Screenshots/Screenshot-20261127-225033.png", extra: true },
-                                                { name: "games.json", desc: "Desktop • JSON Config", icon: "application-json", path: "/home/sir/Desktop/games.json", extra: true }
-                                            ]
+                                            model: root.activityColumns
 
-                                            delegate: Rectangle {
-                                                visible: !modelData.extra || fullScope.showMorePinned
+                                            delegate: ColumnLayout {
                                                 Layout.fillWidth: true
-                                                Layout.preferredHeight: 46
-                                                radius: 7
-                                                color: recItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.09) : "transparent"
-                                                border.color: recItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : "transparent"
+                                                Layout.preferredWidth: 1
+                                                spacing: 5
 
+                                                // Column Header
                                                 RowLayout {
-                                                    anchors.fill: parent
-                                                    anchors.leftMargin: 10
-                                                    anchors.rightMargin: 10
-                                                    spacing: 10
-
+                                                    spacing: 4
                                                     Kirigami.Icon {
-                                                        source: modelData.icon
-                                                        Layout.preferredWidth: 26
-                                                        Layout.preferredHeight: 26
+                                                        source: modelData.icon || "folder"
+                                                        Layout.preferredWidth: 13
+                                                        Layout.preferredHeight: 13
                                                     }
-
-                                                    ColumnLayout {
-                                                        Layout.fillWidth: true
-                                                        spacing: 2
-                                                        Text {
-                                                            text: modelData.name
-                                                            color: "white"
-                                                            font.pixelSize: 12
-                                                            font.weight: Font.Medium
-                                                            elide: Text.ElideRight
-                                                            Layout.fillWidth: true
-                                                        }
-                                                        Text {
-                                                            text: modelData.desc
-                                                            color: "#a2abbd"
-                                                            font.pixelSize: 10
-                                                            elide: Text.ElideRight
-                                                            Layout.fillWidth: true
-                                                        }
+                                                    Text {
+                                                        text: modelData.title
+                                                        color: modelData.color || "#38bdf8"
+                                                        font.pixelSize: 10
+                                                        font.weight: Font.Bold
+                                                        font.letterSpacing: 0.3
+                                                        elide: Text.ElideRight
                                                     }
                                                 }
 
-                                                MouseArea {
-                                                    id: recItemMouse
-                                                    anchors.fill: parent
-                                                    hoverEnabled: true
-                                                    cursorShape: Qt.PointingHandCursor
-                                                    onClicked: {
-                                                        root.launchCommand("xdg-open '" + modelData.path + "'");
-                                                        popDialog.requestClose();
+                                                // Column Items
+                                                ColumnLayout {
+                                                    Layout.fillWidth: true
+                                                    spacing: 3
+
+                                                    Repeater {
+                                                        model: modelData.items
+
+                                                        delegate: Rectangle {
+                                                            Layout.fillWidth: true
+                                                            Layout.preferredHeight: 36
+                                                            radius: 6
+                                                            color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.04)
+                                                            border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
+
+                                                            RowLayout {
+                                                                anchors.fill: parent
+                                                                anchors.leftMargin: 5
+                                                                anchors.rightMargin: 5
+                                                                spacing: 6
+
+                                                                Kirigami.Icon {
+                                                                    source: modelData.icon || "document-open"
+                                                                    Layout.preferredWidth: 16
+                                                                    Layout.preferredHeight: 16
+                                                                }
+
+                                                                ColumnLayout {
+                                                                    Layout.fillWidth: true
+                                                                    spacing: 1
+
+                                                                    Text {
+                                                                        text: modelData.name
+                                                                        color: "white"
+                                                                        font.pixelSize: 10
+                                                                        font.weight: Font.Medium
+                                                                        elide: Text.ElideRight
+                                                                        Layout.fillWidth: true
+                                                                    }
+
+                                                                    Text {
+                                                                        text: modelData.desc
+                                                                        color: "#a2abbd"
+                                                                        font.pixelSize: 8
+                                                                        elide: Text.ElideRight
+                                                                        Layout.fillWidth: true
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            MouseArea {
+                                                                id: colItemMouse
+                                                                anchors.fill: parent
+                                                                hoverEnabled: true
+                                                                cursorShape: Qt.PointingHandCursor
+                                                                onClicked: {
+                                                                    if (modelData.cmd) {
+                                                                        root.launchCommand(modelData.cmd);
+                                                                    } else if (modelData.path) {
+                                                                        root.launchCommand("xdg-open '" + modelData.path + "'");
+                                                                    }
+                                                                    popDialog.requestClose();
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }

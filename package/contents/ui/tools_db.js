@@ -39,6 +39,132 @@ var toolsDb = {
       "path": "/home/sir/Videos"
     }
   ],
+  "activity_columns": [
+    {
+      "title": "\u018fm\u0259liyyatlar",
+      "icon": "utilities-terminal",
+      "color": "#38bdf8",
+      "items": [
+        {
+          "name": "Pacman Update",
+          "desc": "Sistem yenil\u0259m\u0259",
+          "icon": "system-software-install",
+          "cmd": "konsole -e sudo pacman -Syu"
+        },
+        {
+          "name": "Git Status & Log",
+          "desc": "Repo v\u0259ziyy\u0259ti",
+          "icon": "vcs-git",
+          "cmd": "konsole -e bash -c 'git status; git log -n 5; bash'"
+        },
+        {
+          "name": "Plasma Yenil\u0259",
+          "desc": "KDE qab\u0131\u011f\u0131n\u0131 yenil\u0259",
+          "icon": "view-refresh",
+          "cmd": "systemctl --user restart plasma-plasmashell.service"
+        },
+        {
+          "name": "Proses Monitoru",
+          "desc": "Sistem resurslar\u0131",
+          "icon": "utilities-system-monitor",
+          "cmd": "plasma-systemmonitor"
+        }
+      ]
+    },
+    {
+      "title": "Giril\u0259n Yerl\u0259r",
+      "icon": "folder-open",
+      "color": "#00f2fe",
+      "items": [
+        {
+          "name": "Downloads",
+          "desc": "~/Downloads",
+          "icon": "folder-download-symbolic",
+          "path": "/home/sir/Downloads"
+        },
+        {
+          "name": "Documents",
+          "desc": "~/Documents",
+          "icon": "folder-documents-symbolic",
+          "path": "/home/sir/Documents"
+        },
+        {
+          "name": "Desktop / Ops",
+          "desc": "~/Desktop/ops",
+          "icon": "folder",
+          "path": "/home/sir/Desktop/ops"
+        },
+        {
+          "name": "Screenshots",
+          "desc": "~/Pictures/Screenshots",
+          "icon": "folder-pictures-symbolic",
+          "path": "/home/sir/Pictures/Screenshots"
+        }
+      ]
+    },
+    {
+      "title": "Y\u00fckl\u0259n\u0259nl\u0259r",
+      "icon": "folder-download",
+      "color": "#a78bfa",
+      "items": [
+        {
+          "name": "ente-auth-v4.4....",
+          "desc": "Downloads \u2022 GZ",
+          "icon": "package-x-generic",
+          "path": "/home/sir/Downloads/ente-auth-v4.4.27.tar.gz"
+        },
+        {
+          "name": "Antigravity IDE...",
+          "desc": "Downloads \u2022 GZ",
+          "icon": "package-x-generic",
+          "path": "/home/sir/Downloads/Antigravity IDE.tar.gz"
+        },
+        {
+          "name": "DiscordCanarySe...",
+          "desc": "Downloads \u2022 EXE",
+          "icon": "application-x-ms-dos-executable",
+          "path": "/home/sir/Downloads/DiscordCanarySetup.exe"
+        },
+        {
+          "name": "Antigravity-IDE",
+          "desc": "Downloads \u2022 Qovluq",
+          "icon": "folder",
+          "path": "/home/sir/Downloads/Antigravity-IDE"
+        }
+      ]
+    },
+    {
+      "title": "A\u00e7\u0131lanlar",
+      "icon": "document-open-recent",
+      "color": "#34d399",
+      "items": [
+        {
+          "name": "Emil_CV.pdf",
+          "desc": "Desktop \u2022 PDF",
+          "icon": "application-pdf",
+          "path": "/home/sir/Desktop/Emil_Suleymanli_CV_EN.pdf"
+        },
+        {
+          "name": "proxy.txt",
+          "desc": "Desktop/ops \u2022 Text",
+          "icon": "text-plain",
+          "path": "/home/sir/Desktop/ops/proxy.txt"
+        },
+        {
+          "name": "Screenshot-2026...",
+          "desc": "~/Pictures/Screenshots \u2022 PNG",
+          "icon": "image-x-generic",
+          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-021500.png"
+        },
+        {
+          "name": "Screenshot-2026...",
+          "desc": "~/Pictures/Screenshots \u2022 PNG",
+          "icon": "image-x-generic",
+          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-021235.png"
+        }
+      ]
+    }
+  ],
   "categories": [
     {
       "title": "SECURITY & NETWORK",

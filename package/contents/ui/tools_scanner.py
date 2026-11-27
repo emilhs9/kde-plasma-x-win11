@@ -347,8 +347,97 @@ for app in all_desktop_apps:
             "installed": True
         })
 
+def get_activity_columns():
+    # 1. Operations (Əvvəlki əməliyyatlar)
+    ops = [
+        {"name": "Pacman Update", "desc": "Sistem yeniləmə", "icon": "system-software-install", "cmd": "konsole -e sudo pacman -Syu"},
+        {"name": "Git Status & Log", "desc": "Repo vəziyyəti", "icon": "vcs-git", "cmd": "konsole -e bash -c 'git status; git log -n 5; bash'"},
+        {"name": "Plasma Yenilə", "desc": "KDE qabığını yenilə", "icon": "view-refresh", "cmd": "systemctl --user restart plasma-plasmashell.service"},
+        {"name": "Proses Monitoru", "desc": "Sistem resursları", "icon": "utilities-system-monitor", "cmd": "plasma-systemmonitor"}
+    ]
+
+    # 2. Visited Places (Girilən yerlər)
+    places = [
+        {"name": "Downloads", "desc": "~/Downloads", "icon": "folder-download-symbolic", "path": os.path.join(home, "Downloads")},
+        {"name": "Documents", "desc": "~/Documents", "icon": "folder-documents-symbolic", "path": os.path.join(home, "Documents")},
+        {"name": "Desktop / Ops", "desc": "~/Desktop/ops", "icon": "folder", "path": os.path.join(home, "Desktop/ops") if os.path.exists(os.path.join(home, "Desktop/ops")) else os.path.join(home, "Desktop")},
+        {"name": "Screenshots", "desc": "~/Pictures/Screenshots", "icon": "folder-pictures-symbolic", "path": os.path.join(home, "Pictures/Screenshots") if os.path.exists(os.path.join(home, "Pictures/Screenshots")) else os.path.join(home, "Pictures")}
+    ]
+
+    # 3. Downloads (Yüklənənlər)
+    downloads = []
+    down_dir = os.path.join(home, "Downloads")
+    if os.path.exists(down_dir):
+        all_d = sorted(glob.glob(os.path.join(down_dir, "*")), key=os.path.getmtime, reverse=True)
+        for f in all_d:
+            bname = os.path.basename(f)
+            if bname.startswith("."): continue
+            ext = bname.split(".")[-1].lower() if "." in bname else ""
+            icon = "package-x-generic" if ext in ["tar", "gz", "zip", "xz"] else ("application-x-ms-dos-executable" if ext == "exe" else ("folder" if os.path.isdir(f) else "document-open"))
+            clean_name = bname if len(bname) <= 18 else bname[:15] + "..."
+            downloads.append({
+                "name": clean_name,
+                "desc": "Downloads • " + (ext.upper() if ext else ("Qovluq" if os.path.isdir(f) else "Fayl")),
+                "icon": icon,
+                "path": f
+            })
+            if len(downloads) >= 4: break
+
+    # 4. Recent Files (Açılanlar - with document diversity)
+    recent_files = []
+    xbel = os.path.join(home, ".local/share/recently-used.xbel")
+    seen = set()
+    
+    # Priority desktop / ops files if present
+    curated = [
+        (os.path.join(home, "Desktop/Emil_Suleymanli_CV_EN.pdf"), "Emil_CV.pdf", "Desktop • PDF", "application-pdf"),
+        (os.path.join(home, "Desktop/ops/proxy.txt"), "proxy.txt", "Desktop/ops • Text", "text-plain"),
+        (os.path.join(home, "Desktop/ops/antigravity-skills.md"), "skills.md", "Desktop/ops • MD", "text-markdown"),
+        (os.path.join(home, "Desktop/games.json"), "games.json", "Desktop • JSON", "application-json")
+    ]
+    for c_path, c_name, c_desc, c_icon in curated:
+        if os.path.exists(c_path):
+            seen.add(os.path.basename(c_path))
+            recent_files.append({"name": c_name, "desc": c_desc, "icon": c_icon, "path": c_path})
+            if len(recent_files) >= 2: break
+
+    if os.path.exists(xbel):
+        try:
+            import xml.etree.ElementTree as ET
+            import urllib.parse
+            tree = ET.parse(xbel)
+            for bm in reversed(tree.getroot().findall("bookmark")):
+                href = bm.get("href", "")
+                if href.startswith("file://"):
+                    p = urllib.parse.unquote(href[7:])
+                    if os.path.exists(p) and not os.path.isdir(p):
+                        bname = os.path.basename(p)
+                        if bname not in seen and not bname.endswith(".tmp") and not bname.startswith("."):
+                            seen.add(bname)
+                            ext = bname.split(".")[-1].lower() if "." in bname else ""
+                            icon = "image-x-generic" if ext in ["png", "jpg", "jpeg", "svg"] else ("application-pdf" if ext == "pdf" else "text-plain")
+                            clean_name = bname if len(bname) <= 18 else bname[:15] + "..."
+                            rel_dir = os.path.dirname(p).replace(home, "~")
+                            recent_files.append({
+                                "name": clean_name,
+                                "desc": rel_dir + " • " + (ext.upper() if ext else "Fayl"),
+                                "icon": icon,
+                                "path": p
+                            })
+                            if len(recent_files) >= 4: break
+        except Exception:
+            pass
+
+    return [
+        {"title": "Əməliyyatlar", "icon": "utilities-terminal", "color": "#38bdf8", "items": ops},
+        {"title": "Girilən Yerlər", "icon": "folder-open", "color": "#00f2fe", "items": places},
+        {"title": "Yüklənənlər", "icon": "folder-download", "color": "#a78bfa", "items": downloads},
+        {"title": "Açılanlar", "icon": "document-open-recent", "color": "#34d399", "items": recent_files}
+    ]
+
 output_data = {
     "places": get_places(),
+    "activity_columns": get_activity_columns(),
     "categories": [
         {
             "title": "SECURITY & NETWORK",
