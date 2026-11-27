@@ -1431,12 +1431,11 @@ PlasmoidItem {
                                         }
                                     }
 
-                                    Item { Layout.fillHeight: true }
-
-                                    // Recommended Section Header
+                                    // Recommended Section Header - Exactly 5px below apps grid
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Layout.bottomMargin: 4
+                                        Layout.topMargin: 5
+                                        Layout.bottomMargin: 6
                                         Text {
                                             text: "Recommended"
                                             color: "white"
@@ -1446,9 +1445,10 @@ PlasmoidItem {
                                         Item { Layout.fillWidth: true }
                                     }
 
-                                    // 4-Column Activity Grid: Clean boxes without category names
+                                    // 4-Column Activity Grid: Enlarged boxes filling space down to 5px above bottom line
                                     RowLayout {
                                         Layout.fillWidth: true
+                                        Layout.fillHeight: true
                                         spacing: 8
 
                                         Repeater {
@@ -1456,39 +1456,42 @@ PlasmoidItem {
 
                                             delegate: ColumnLayout {
                                                 Layout.fillWidth: true
+                                                Layout.fillHeight: true
                                                 Layout.preferredWidth: 1
-                                                spacing: 4
+                                                spacing: 6
 
                                                 Repeater {
                                                     model: modelData.items
 
                                                     delegate: Rectangle {
                                                         Layout.fillWidth: true
-                                                        Layout.preferredHeight: 35
-                                                        radius: 6
-                                                        color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.04)
-                                                        border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
+                                                        Layout.fillHeight: true
+                                                        Layout.preferredHeight: 52
+                                                        Layout.minimumHeight: 44
+                                                        radius: 7
+                                                        color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.05)
+                                                        border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : Qt.rgba(1, 1, 1, 0.08)
 
                                                         RowLayout {
                                                             anchors.fill: parent
-                                                            anchors.leftMargin: 6
-                                                            anchors.rightMargin: 6
-                                                            spacing: 7
+                                                            anchors.leftMargin: 8
+                                                            anchors.rightMargin: 8
+                                                            spacing: 9
 
                                                             Kirigami.Icon {
                                                                 source: modelData.icon || "document-open"
-                                                                Layout.preferredWidth: 16
-                                                                Layout.preferredHeight: 16
+                                                                Layout.preferredWidth: 22
+                                                                Layout.preferredHeight: 22
                                                             }
 
                                                             ColumnLayout {
                                                                 Layout.fillWidth: true
-                                                                spacing: 1
+                                                                spacing: 2
 
                                                                 Text {
                                                                     text: modelData.name
                                                                     color: "white"
-                                                                    font.pixelSize: 10
+                                                                    font.pixelSize: 11
                                                                     font.weight: Font.Medium
                                                                     elide: Text.ElideRight
                                                                     Layout.fillWidth: true
@@ -1497,7 +1500,7 @@ PlasmoidItem {
                                                                 Text {
                                                                     text: modelData.desc
                                                                     color: "#a2abbd"
-                                                                    font.pixelSize: 8
+                                                                    font.pixelSize: 9
                                                                     elide: Text.ElideRight
                                                                     Layout.fillWidth: true
                                                                 }
