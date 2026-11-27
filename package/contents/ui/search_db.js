@@ -689,6 +689,15 @@ var searchDb = {
       "type": "file"
     },
     {
+      "name": "Screenshot-20261128-015644.png",
+      "icon": "image-x-generic",
+      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-015644.png",
+      "location": "Pictures/Screenshots",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-015644.png\"",
+      "desc": "Pictures/Screenshots \u2022 PNG",
+      "type": "file"
+    },
+    {
       "name": "Screenshot-20261128-012303.png",
       "icon": "image-x-generic",
       "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-012303.png",
@@ -725,12 +734,21 @@ var searchDb = {
       "type": "file"
     },
     {
-      "name": "win11-startmenu",
+      "name": "KDE Plasma x win11",
       "icon": "folder",
-      "path": "/home/sir/Documents/win11-startmenu",
+      "path": "/home/sir/Documents/KDE Plasma x win11",
       "location": "Documents",
-      "cmd": "xdg-open \"/home/sir/Documents/win11-startmenu\"",
+      "cmd": "xdg-open \"/home/sir/Documents/KDE Plasma x win11\"",
       "desc": "Documents \u2022 Folder",
+      "type": "file"
+    },
+    {
+      "name": "ente-auth-v4.4.27.tar.gz",
+      "icon": "package-x-generic",
+      "path": "/home/sir/Documents/ente-auth-v4.4.27.tar.gz",
+      "location": "Documents",
+      "cmd": "xdg-open \"/home/sir/Documents/ente-auth-v4.4.27.tar.gz\"",
+      "desc": "Documents \u2022 GZ",
       "type": "file"
     }
   ],

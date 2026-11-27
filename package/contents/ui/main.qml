@@ -1,5 +1,6 @@
 import "search_engine.js" as SearchEngine
 import "search_db.js" as SearchDB
+import "tools_db.js" as ToolsDB
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
@@ -115,6 +116,56 @@ PlasmoidItem {
         executableSource.exec("qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '" + js + "'");
     }
 
+    property var sidebarPlaces: (typeof ToolsDB !== "undefined" && ToolsDB.toolsDb && ToolsDB.toolsDb.places) ? ToolsDB.toolsDb.places : [
+        { name: "Home", desc: "~/ (Personal Folder)", icon: "user-home-symbolic", path: "/home/sir" },
+        { name: "Documents", desc: "~/Documents", icon: "folder-documents-symbolic", path: "/home/sir/Documents" },
+        { name: "Downloads", desc: "~/Downloads", icon: "folder-download-symbolic", path: "/home/sir/Downloads" },
+        { name: "Pictures", desc: "~/Pictures", icon: "folder-pictures-symbolic", path: "/home/sir/Pictures" },
+        { name: "Music", desc: "~/Music", icon: "folder-music-symbolic", path: "/home/sir/Music" },
+        { name: "Videos", desc: "~/Videos", icon: "folder-videos-symbolic", path: "/home/sir/Videos" }
+    ]
+    property var sidebarCategories: (typeof ToolsDB !== "undefined" && ToolsDB.toolsDb && ToolsDB.toolsDb.categories) ? ToolsDB.toolsDb.categories : []
+
+    Plasma5Support.DataSource {
+        id: toolsDataSource
+        engine: "executable"
+        connectedSources: []
+        onNewData: function(sourceName, data) {
+            disconnectSource(sourceName);
+            var stdout = data["stdout"];
+            if (stdout && stdout.length > 0) {
+                try {
+                    var parsed = JSON.parse(stdout);
+                    if (parsed.places && parsed.places.length > 0) {
+                        root.sidebarPlaces = parsed.places;
+                    }
+                    if (parsed.categories && parsed.categories.length > 0) {
+                        root.sidebarCategories = parsed.categories;
+                    }
+                } catch(e) {
+                    console.log("Error parsing dynamic tools JSON:", e);
+                }
+            }
+        }
+        function exec(cmd) {
+            connectSource(cmd);
+        }
+    }
+
+    function refreshTools() {
+        var scriptUrl = Qt.resolvedUrl("tools_scanner.py").toString();
+        var scriptPath = scriptUrl.replace(/^file:\/\//, "");
+        toolsDataSource.exec("python3 '" + scriptPath + "'");
+    }
+
+    Timer {
+        id: toolRefreshTimer
+        interval: 15000
+        repeat: true
+        running: (dialogWindow && dialogWindow.visible)
+        onTriggered: root.refreshTools()
+    }
+
     property QtObject dialogWindow: null
 
     onScreenGeometryChanged: {
@@ -128,6 +179,7 @@ PlasmoidItem {
         plasmoid.activated.connect(function() {
             if (dialogWindow) dialogWindow.toggleMenu();
         });
+        root.refreshTools();
     }
 
     // -------------------------------------------------------------
@@ -213,6 +265,7 @@ PlasmoidItem {
                 requestActivate();
                 fullScope.forceActiveFocus();
                 focusTimer.restart();
+                root.refreshTools();
             }
 
             function requestClose() {
@@ -1485,15 +1538,22 @@ PlasmoidItem {
 
                             // RIGHT SECTION: Exact Sidebar from screenshot
                             Item {
-                                Layout.preferredWidth: 180
+                                Layout.preferredWidth: 195
                                 Layout.fillHeight: true
 
                                 Flickable {
+                                    id: sidebarFlickable
                                     anchors.fill: parent
-                                    anchors.leftMargin: 14
-                                    anchors.rightMargin: 14
+                                    anchors.leftMargin: 12
+                                    anchors.rightMargin: 8
                                     contentHeight: sidebarColumn.implicitHeight
                                     clip: true
+                                    boundsBehavior: Flickable.StopAtBounds
+
+                                    QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                                        policy: QQC2.ScrollBar.AsNeeded
+                                        width: 4
+                                    }
 
                                     ColumnLayout {
                                         id: sidebarColumn
@@ -1514,14 +1574,7 @@ PlasmoidItem {
                                             spacing: 4
 
                                             Repeater {
-                                                model: [
-                                                    { name: "Home", desc: "~/ (Personal Folder)", icon: "user-home-symbolic", path: "/home/sir" },
-                                                    { name: "Documents", desc: "~/Documents", icon: "folder-documents-symbolic", path: "/home/sir/Documents" },
-                                                    { name: "Downloads", desc: "~/Downloads", icon: "folder-download-symbolic", path: "/home/sir/Downloads" },
-                                                    { name: "Pictures", desc: "~/Pictures", icon: "folder-pictures-symbolic", path: "/home/sir/Pictures" },
-                                                    { name: "Music", desc: "~/Music", icon: "folder-music-symbolic", path: "/home/sir/Music" },
-                                                    { name: "Videos", desc: "~/Videos", icon: "folder-videos-symbolic", path: "/home/sir/Videos" }
-                                                ]
+                                                model: root.sidebarPlaces
 
                                                 delegate: Rectangle {
                                                     Layout.fillWidth: true
@@ -1572,140 +1625,83 @@ PlasmoidItem {
                                             }
                                         }
 
-                                        // Category 2: SECURITY & NETWORK
-                                        Text {
-                                            text: "SECURITY & NETWORK"
-                                            color: "#00f2fe"
-                                            font.pixelSize: 10
-                                            font.weight: Font.Bold
-                                            font.letterSpacing: 0.6
-                                        }
+                                        // Dynamic Categories: SECURITY & NETWORK, SYSTEM & TOOLS, DEVELOPMENT & UTILITIES
+                                        Repeater {
+                                            model: root.sidebarCategories
 
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            spacing: 4
+                                            delegate: ColumnLayout {
+                                                Layout.fillWidth: true
+                                                spacing: 4
 
-                                            Repeater {
-                                                model: [
-                                                    { name: "Nmap Scanner", desc: "Network Recon", icon: "security-high", cmd: "konsole -e nmap --help" },
-                                                    { name: "Wireshark", desc: "Packet Analysis", icon: "network-wired", cmd: "wireshark" },
-                                                    { name: "Burp Suite", desc: "Web Security", icon: "security-medium", cmd: "burpsuite" },
-                                                    { name: "Metasploit", desc: "Exploit Framework", icon: "utilities-terminal", cmd: "konsole -e msfconsole" }
-                                                ]
-
-                                                delegate: Rectangle {
-                                                    Layout.fillWidth: true
-                                                    Layout.preferredHeight: 36
-                                                    radius: 6
-                                                    color: secMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
-                                                    border.color: secMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.35) : "transparent"
-
-                                                    RowLayout {
-                                                        anchors.fill: parent
-                                                        anchors.leftMargin: 6
-                                                        anchors.rightMargin: 6
-                                                        spacing: 10
-
-                                                        Kirigami.Icon {
-                                                            source: modelData.icon
-                                                            Layout.preferredWidth: 16
-                                                            Layout.preferredHeight: 16
-                                                        }
-
-                                                        ColumnLayout {
-                                                            Layout.fillWidth: true
-                                                            spacing: 1
-                                                            Text {
-                                                                text: modelData.name
-                                                                color: "white"
-                                                                font.pixelSize: 11
-                                                                font.weight: Font.Medium
-                                                            }
-                                                            Text {
-                                                                text: modelData.desc
-                                                                color: "#a2abbd"
-                                                                font.pixelSize: 9
-                                                                elide: Text.ElideRight
-                                                                Layout.fillWidth: true
-                                                            }
-                                                        }
-                                                    }
-
-                                                    MouseArea {
-                                                        id: secMouse
-                                                        anchors.fill: parent
-                                                        hoverEnabled: true
-                                                        cursorShape: Qt.PointingHandCursor
-                                                        onClicked: root.launchCommand(modelData.cmd)
-                                                    }
+                                                Text {
+                                                    text: modelData.title
+                                                    color: modelData.color || "#38bdf8"
+                                                    font.pixelSize: 10
+                                                    font.weight: Font.Bold
+                                                    font.letterSpacing: 0.6
                                                 }
-                                            }
-                                        }
 
-                                        // Category 3: SYSTEM & TOOLS
-                                        Text {
-                                            text: "SYSTEM & TOOLS"
-                                            color: "#38bdf8"
-                                            font.pixelSize: 10
-                                            font.weight: Font.Bold
-                                            font.letterSpacing: 0.6
-                                        }
-
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            spacing: 4
-
-                                            Repeater {
-                                                model: [
-                                                    { name: "System Settings", desc: "Hardware & Display", icon: "configure", cmd: "systemsettings" },
-                                                    { name: "About System", desc: "OS & Kernel Info", icon: "help-about-symbolic", cmd: "kinfocenter" },
-                                                    { name: "Package Manager", desc: "Pacman / AUR", icon: "package-x-generic", cmd: "plasma-discover" }
-                                                ]
-
-                                                delegate: Rectangle {
+                                                ColumnLayout {
                                                     Layout.fillWidth: true
-                                                    Layout.preferredHeight: 36
-                                                    radius: 6
-                                                    color: sysToolMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
-                                                    border.color: sysToolMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.35) : "transparent"
+                                                    spacing: 4
 
-                                                    RowLayout {
-                                                        anchors.fill: parent
-                                                        anchors.leftMargin: 6
-                                                        anchors.rightMargin: 6
-                                                        spacing: 10
+                                                    Repeater {
+                                                        model: modelData.items
 
-                                                        Kirigami.Icon {
-                                                            source: modelData.icon
-                                                            Layout.preferredWidth: 16
-                                                            Layout.preferredHeight: 16
-                                                        }
-
-                                                        ColumnLayout {
+                                                        delegate: Rectangle {
                                                             Layout.fillWidth: true
-                                                            spacing: 1
-                                                            Text {
-                                                                text: modelData.name
-                                                                color: "white"
-                                                                font.pixelSize: 11
-                                                                font.weight: Font.Medium
+                                                            Layout.preferredHeight: 36
+                                                            radius: 6
+                                                            color: catItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
+                                                            border.color: catItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.35) : "transparent"
+
+                                                            RowLayout {
+                                                                anchors.fill: parent
+                                                                anchors.leftMargin: 6
+                                                                anchors.rightMargin: 6
+                                                                spacing: 10
+
+                                                                Kirigami.Icon {
+                                                                    source: modelData.icon || "application-x-executable"
+                                                                    Layout.preferredWidth: 16
+                                                                    Layout.preferredHeight: 16
+                                                                }
+
+                                                                ColumnLayout {
+                                                                    Layout.fillWidth: true
+                                                                    spacing: 1
+                                                                    Text {
+                                                                        text: modelData.name
+                                                                        color: "white"
+                                                                        font.pixelSize: 11
+                                                                        font.weight: Font.Medium
+                                                                        elide: Text.ElideRight
+                                                                        Layout.fillWidth: true
+                                                                    }
+                                                                    Text {
+                                                                        text: modelData.desc
+                                                                        color: "#a2abbd"
+                                                                        font.pixelSize: 9
+                                                                        elide: Text.ElideRight
+                                                                        Layout.fillWidth: true
+                                                                    }
+                                                                }
                                                             }
-                                                            Text {
-                                                                text: modelData.desc
-                                                                color: "#a2abbd"
-                                                                font.pixelSize: 9
-                                                                elide: Text.ElideRight
-                                                                Layout.fillWidth: true
+
+                                                            MouseArea {
+                                                                id: catItemMouse
+                                                                anchors.fill: parent
+                                                                hoverEnabled: true
+                                                                cursorShape: Qt.PointingHandCursor
+                                                                onClicked: {
+                                                                    if (modelData.cmd) {
+                                                                        root.launchCommand(modelData.cmd);
+                                                                    } else if (modelData.path) {
+                                                                        root.openFolder(modelData.path);
+                                                                    }
+                                                                }
                                                             }
                                                         }
-                                                    }
-
-                                                    MouseArea {
-                                                        id: sysToolMouse
-                                                        anchors.fill: parent
-                                                        hoverEnabled: true
-                                                        cursorShape: Qt.PointingHandCursor
-                                                        onClicked: root.launchCommand(modelData.cmd)
                                                     }
                                                 }
                                             }

@@ -3,7 +3,8 @@ import os, glob, json, sys
 
 home = os.path.expanduser("~")
 search_db_path = os.path.join(home, ".local/share/plasma/plasmoids/org.kde.plasma.win11startmenu/contents/ui/search_db.js")
-repo_db_path = os.path.join(home, "Projects/win11-startmenu/package/contents/ui/search_db.js")
+repo_dir = os.path.dirname(os.path.abspath(__file__))
+repo_db_path = os.path.join(repo_dir, "package/contents/ui/search_db.js")
 
 dirs = [
     "/usr/share/applications",
@@ -128,3 +129,13 @@ for target in [search_db_path, repo_db_path]:
         print("Error writing target:", target, e)
 
 print("Updated search_db.js with", len(apps), "dynamically discovered applications")
+
+# Also update tools database
+try:
+    import subprocess
+    scanner_path = os.path.join(repo_dir, "package/contents/ui/tools_scanner.py")
+    if os.path.exists(scanner_path):
+        subprocess.run([sys.executable, scanner_path], check=False)
+        print("Updated tools_db.js via tools_scanner.py")
+except Exception as e:
+    print("Error invoking tools_scanner:", e)
