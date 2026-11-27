@@ -1255,8 +1255,9 @@ PlasmoidItem {
                                     anchors.fill: parent
                                     anchors.leftMargin: 24
                                     anchors.rightMargin: 20
+                                    anchors.bottomMargin: 14
                                     visible: !fullScope.isSearching && !fullScope.showAllApps
-                                    spacing: 16
+                                    spacing: 8
 
                                     // Pinned Header
                                     RowLayout {
@@ -1294,7 +1295,7 @@ PlasmoidItem {
                                     GridLayout {
                                         Layout.fillWidth: true
                                         columns: 6
-                                        rowSpacing: 10
+                                        rowSpacing: 6
                                         columnSpacing: 6
 
                                         Repeater {
@@ -1327,7 +1328,7 @@ PlasmoidItem {
                                                 id: pinDelegateRoot
                                                 visible: true
                                                 Layout.preferredWidth: 94
-                                                Layout.preferredHeight: 74
+                                                Layout.preferredHeight: 70
 
                                                 property int itemIndex: index
                                                 property bool isDragging: dragArea.drag.active
@@ -1348,7 +1349,7 @@ PlasmoidItem {
                                                 Rectangle {
                                                     id: pinVisual
                                                     width: 94
-                                                    height: 74
+                                                    height: 70
                                                     radius: 8
                                                     color: (dragArea.drag.active) ? Qt.rgba(0.2, 0.5, 0.9, 0.3) : (dragArea.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent")
                                                     border.color: (dragArea.drag.active) ? "#38bdf8" : (dragArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : "transparent")
@@ -1445,6 +1446,7 @@ PlasmoidItem {
                                     // 4-Column Activity Dashboard: Əməliyyatlar, Girilən Yerlər, Yüklənənlər, Açılanlar
                                     RowLayout {
                                         Layout.fillWidth: true
+                                        Layout.bottomMargin: 14
                                         spacing: 8
 
                                         Repeater {
@@ -1476,14 +1478,14 @@ PlasmoidItem {
                                                 // Column Items
                                                 ColumnLayout {
                                                     Layout.fillWidth: true
-                                                    spacing: 3
+                                                    spacing: 2
 
                                                     Repeater {
                                                         model: modelData.items
 
                                                         delegate: Rectangle {
                                                             Layout.fillWidth: true
-                                                            Layout.preferredHeight: 36
+                                                            Layout.preferredHeight: 33
                                                             radius: 6
                                                             color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.04)
                                                             border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
@@ -1496,8 +1498,8 @@ PlasmoidItem {
 
                                                                 Kirigami.Icon {
                                                                     source: modelData.icon || "document-open"
-                                                                    Layout.preferredWidth: 16
-                                                                    Layout.preferredHeight: 16
+                                                                    Layout.preferredWidth: 15
+                                                                    Layout.preferredHeight: 15
                                                                 }
 
                                                                 ColumnLayout {
