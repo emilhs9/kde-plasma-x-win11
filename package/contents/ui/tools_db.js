@@ -136,7 +136,7 @@ var toolsDb = {
           "name": "Screenshot-2026...",
           "desc": "~/Pictures/Screenshots \u2022 PNG",
           "icon": "image-x-generic",
-          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-025454.png"
+          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-032636.png"
         }
       ]
     }

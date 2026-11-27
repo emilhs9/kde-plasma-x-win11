@@ -41,6 +41,7 @@ PlasmoidItem {
     // Full Application Model with Linux XDG Categories
     ListModel {
         id: fullAppsListModel
+        ListElement { name: "Google Antigravity"; icon: "/home/sir/.local/share/icons/antigravity.png"; cmd: "/home/sir/Downloads/Antigravity-IDE/antigravity-ide --no-sandbox --disable-gpu --ozone-platform=x11"; category: "Development"; desc: "AI Coding IDE"; desktop: "/home/sir/.local/share/applications/antigravity.desktop" }
         ListElement { name: "Ark"; icon: "ark"; cmd: "ark"; category: "Utilities"; desc: "Archiving Tool"; desktop: "/usr/share/applications/org.kde.ark.desktop" }
         ListElement { name: "Brave Web Browser"; icon: "com.brave.Browser"; cmd: "flatpak run com.brave.Browser"; category: "Internet"; desc: "Fast & Secure Web Browser"; desktop: "/var/lib/flatpak/exports/share/applications/com.brave.Browser.desktop" }
         ListElement { name: "CMake"; icon: "CMakeSetup"; cmd: "cmake-gui"; category: "Development"; desc: "Cross-platform build system"; desktop: "/usr/share/applications/cmake-gui.desktop" }
@@ -377,13 +378,15 @@ PlasmoidItem {
 
                     var allCandidates = [];
 
-                    // 1. Gather all Apps
+                    // 1. Gather all Apps (Top priority in search hierarchy)
                     var apps = SearchDB.searchDb.apps || [];
                     var addedAppNames = {};
+                    var matchedApps = [];
                     for (var i = 0; i < apps.length; i++) {
                         var a = apps[i];
-                        if (a.name.toLowerCase().indexOf(q) !== -1 || a.desc.toLowerCase().indexOf(q) !== -1 || a.category.toLowerCase().indexOf(q) !== -1) {
-                            var appWithScore = Object.assign({}, a, { score: SearchEngine.getItemScore(a.name, q) });
+                        if (a.name.toLowerCase().indexOf(q) !== -1 || a.desc.toLowerCase().indexOf(q) !== -1 || a.category.toLowerCase().indexOf(q) !== -1 || (a.desktop && a.desktop.toLowerCase().indexOf(q) !== -1)) {
+                            var appWithScore = Object.assign({}, a, { score: SearchEngine.getItemScore(a, q, "app") });
+                            matchedApps.push(appWithScore);
                             allCandidates.push(appWithScore);
                             addedAppNames[a.name.toLowerCase()] = true;
                         }
@@ -403,27 +406,28 @@ PlasmoidItem {
                                     "desc": "System Application",
                                     "category": "System",
                                     "type": "app",
-                                    "score": SearchEngine.getItemScore(rName, q)
+                                    "score": SearchEngine.getItemScore(rName, q, "app")
                                 };
+                                matchedApps.push(dynamicApp);
                                 allCandidates.push(dynamicApp);
                                 addedAppNames[rName.toLowerCase()] = true;
                             }
                         }
                     }
 
-                    // Sort apps by frequency score descending
-                    allCandidates.sort(function(a, b) { return b.score - a.score; });
-                    for (var m = 0; m < allCandidates.length; m++) {
-                        searchAppsModel.append(allCandidates[m]);
+                    // Sort apps by frequency & relevance score descending
+                    matchedApps.sort(function(a, b) { return b.score - a.score; });
+                    for (var m = 0; m < matchedApps.length; m++) {
+                        searchAppsModel.append(matchedApps[m]);
                     }
 
-                    // 2. Gather Files
+                    // 2. Gather Files (Lower priority than applications)
                     var files = SearchDB.searchDb.files || [];
                     var matchedFiles = [];
                     for (var j = 0; j < files.length; j++) {
                         var fl = files[j];
                         if (fl.name.toLowerCase().indexOf(q) !== -1 || fl.desc.toLowerCase().indexOf(q) !== -1 || fl.location.toLowerCase().indexOf(q) !== -1) {
-                            var fWithScore = Object.assign({}, fl, { score: SearchEngine.getItemScore(fl.name, q) });
+                            var fWithScore = Object.assign({}, fl, { score: SearchEngine.getItemScore(fl, q, "file") });
                             matchedFiles.push(fWithScore);
                             allCandidates.push(fWithScore);
                         }
@@ -439,7 +443,7 @@ PlasmoidItem {
                     for (var k = 0; k < tools.length; k++) {
                         var t = tools[k];
                         if (t.name.toLowerCase().indexOf(q) !== -1 || t.desc.toLowerCase().indexOf(q) !== -1 || t.category.toLowerCase().indexOf(q) !== -1) {
-                            var tWithScore = Object.assign({}, t, { score: SearchEngine.getItemScore(t.name, q) });
+                            var tWithScore = Object.assign({}, t, { score: SearchEngine.getItemScore(t, q, "tool") });
                             matchedTools.push(tWithScore);
                             allCandidates.push(tWithScore);
                         }
@@ -449,7 +453,7 @@ PlasmoidItem {
                         searchToolsModel.append(matchedTools[p]);
                     }
 
-                    // 4. Calculate Predictive Autocomplete (knows what user will type next)
+                    // 4. Calculate Predictive Autocomplete (always prioritizes Applications, never files)
                     var topPred = SearchEngine.getTopPrediction(q, allCandidates);
                     if (topPred) {
                         topPredictedItem = topPred;
@@ -457,13 +461,26 @@ PlasmoidItem {
                         var rawName = topPred.name;
                         if (rawName.toLowerCase().indexOf(q) === 0) {
                             searchPredictionSuffix = rawName.substring(q.length);
+                        } else {
+                            var words = rawName.split(/[\s\-_.]+/);
+                            var foundSuffix = false;
+                            for (var wi = 0; wi < words.length; wi++) {
+                                if (words[wi].toLowerCase().indexOf(q) === 0) {
+                                    searchPredictionSuffix = words[wi].substring(q.length);
+                                    foundSuffix = true;
+                                    break;
+                                }
+                            }
+                            if (!foundSuffix) searchPredictionSuffix = "";
                         }
                     } else if (searchAppsModel.count > 0) {
                         selectedSearchItem = searchAppsModel.get(0);
-                    } else if (searchFilesModel.count > 0) {
-                        selectedSearchItem = searchFilesModel.get(0);
+                        topPredictedItem = searchAppsModel.get(0);
                     } else if (searchToolsModel.count > 0) {
                         selectedSearchItem = searchToolsModel.get(0);
+                        topPredictedItem = searchToolsModel.get(0);
+                    } else if (searchFilesModel.count > 0) {
+                        selectedSearchItem = searchFilesModel.get(0);
                     }
                 }
 

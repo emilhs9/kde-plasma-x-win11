@@ -392,6 +392,15 @@ var searchDb = {
       "type": "file"
     },
     {
+      "name": "best taskbar",
+      "icon": "folder",
+      "path": "/home/sir/Desktop/best taskbar",
+      "location": "Desktop",
+      "cmd": "xdg-open \"/home/sir/Desktop/best taskbar\"",
+      "desc": "Desktop \u2022 Folder",
+      "type": "file"
+    },
+    {
       "name": "Wildlife.wmv",
       "icon": "video-x-generic",
       "path": "/home/sir/Desktop/Wildlife.wmv",
@@ -680,38 +689,29 @@ var searchDb = {
       "type": "file"
     },
     {
-      "name": "Screenshot-20261128-012550.png",
+      "name": "Screenshot-20261128-032117.png",
       "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-012550.png",
+      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-032117.png",
       "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-012550.png\"",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-032117.png\"",
       "desc": "Pictures/Screenshots \u2022 PNG",
       "type": "file"
     },
     {
-      "name": "Screenshot-20261128-015644.png",
+      "name": "Screenshot-20261128-032636.png",
       "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-015644.png",
+      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-032636.png",
       "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-015644.png\"",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-032636.png\"",
       "desc": "Pictures/Screenshots \u2022 PNG",
       "type": "file"
     },
     {
-      "name": "Screenshot-20261128-012303.png",
+      "name": "Screenshot-20261128-031845.png",
       "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-012303.png",
+      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-031845.png",
       "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-012303.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "stable_position_test.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/stable_position_test.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/stable_position_test.png\"",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-031845.png\"",
       "desc": "Pictures/Screenshots \u2022 PNG",
       "type": "file"
     },
