@@ -151,7 +151,7 @@ PlasmoidItem {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     if (dialogWindow) {
-                        dialogWindow.visible = !dialogWindow.visible;
+                        dialogWindow.toggleMenu();
                     }
                 }
             }
