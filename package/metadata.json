@@ -12,7 +12,7 @@
         "Icon": "start-here-archlinux",
         "Id": "org.kde.plasma.win11startmenu",
         "License": "GPL-3.0+",
-        "Name": "Windows 11 Start Menu",
+        "Name": "KDE Plasma x win11",
         "Version": "1.0.0",
         "Website": "https://archlinux.org"
     },

@@ -1,4 +1,4 @@
-# Windows 11 Start Menu for KDE Plasma 6
+# KDE Plasma x win11 — Start Menu Plasmoid
 
 A modern, fluid, and highly customizable Windows 11-style Start Menu plasmoid designed for KDE Plasma 6 with deep Arch Linux and Wayland/X11 integration.
 
