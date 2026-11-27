@@ -1,3 +1,4 @@
+import "search_engine.js" as SearchEngine
 import "search_db.js" as SearchDB
 import QtQuick
 import QtQuick.Layouts
@@ -286,10 +287,25 @@ PlasmoidItem {
 
                 // Instant Multi-Category Search Models
                 ListModel { id: searchAppsModel }
+                property string searchPredictionSuffix: ""
+                property var topPredictedItem: null
+
                 ListModel { id: searchFilesModel }
                 ListModel { id: searchToolsModel }
                 property string activeSearchFilter: "All"
                 property var selectedSearchItem: null
+
+                function recordAndLaunch(item) {
+                    if (!item) return;
+                    SearchEngine.recordSearchSelection(item.name, item.type, item.cmd, item.icon, item.desc);
+                    if (item.cmd && item.cmd.indexOf("krunner_trigger:") === 0) {
+                        var rIdx = parseInt(item.cmd.split(":")[1]);
+                        runnerModel.trigger(rIdx, "", null);
+                    } else {
+                        root.launchCommand(item.cmd);
+                    }
+                    popDialog.requestClose();
+                }
 
                 function performInstantSearch(query) {
                     var q = query.trim().toLowerCase();
@@ -297,22 +313,26 @@ PlasmoidItem {
                     searchFilesModel.clear();
                     searchToolsModel.clear();
                     selectedSearchItem = null;
+                    topPredictedItem = null;
+                    searchPredictionSuffix = "";
 
                     if (q.length === 0) return;
 
-                    // 1. In-memory / scanned database search
+                    var allCandidates = [];
+
+                    // 1. Gather all Apps
                     var apps = SearchDB.searchDb.apps || [];
                     var addedAppNames = {};
                     for (var i = 0; i < apps.length; i++) {
                         var a = apps[i];
                         if (a.name.toLowerCase().indexOf(q) !== -1 || a.desc.toLowerCase().indexOf(q) !== -1 || a.category.toLowerCase().indexOf(q) !== -1) {
-                            searchAppsModel.append(a);
+                            var appWithScore = Object.assign({}, a, { score: SearchEngine.getItemScore(a.name, q) });
+                            allCandidates.push(appWithScore);
                             addedAppNames[a.name.toLowerCase()] = true;
-                            if (!selectedSearchItem) selectedSearchItem = a;
                         }
                     }
 
-                    // 2. Dynamic live system RunnerModel integration (automatically catches any newly installed app)
+                    // Dynamic live system RunnerModel integration
                     if (runnerModel && runnerModel.count > 0) {
                         for (var r = 0; r < runnerModel.count; r++) {
                             var rName = runnerModel.data(runnerModel.index(r, 0), Qt.DisplayRole) || "";
@@ -325,31 +345,68 @@ PlasmoidItem {
                                     "cmd": "krunner_trigger:" + r,
                                     "desc": "System Application",
                                     "category": "System",
-                                    "type": "app"
+                                    "type": "app",
+                                    "score": SearchEngine.getItemScore(rName, q)
                                 };
-                                searchAppsModel.append(dynamicApp);
+                                allCandidates.push(dynamicApp);
                                 addedAppNames[rName.toLowerCase()] = true;
-                                if (!selectedSearchItem) selectedSearchItem = dynamicApp;
                             }
                         }
                     }
 
+                    // Sort apps by frequency score descending
+                    allCandidates.sort(function(a, b) { return b.score - a.score; });
+                    for (var m = 0; m < allCandidates.length; m++) {
+                        searchAppsModel.append(allCandidates[m]);
+                    }
+
+                    // 2. Gather Files
                     var files = SearchDB.searchDb.files || [];
+                    var matchedFiles = [];
                     for (var j = 0; j < files.length; j++) {
                         var fl = files[j];
                         if (fl.name.toLowerCase().indexOf(q) !== -1 || fl.desc.toLowerCase().indexOf(q) !== -1 || fl.location.toLowerCase().indexOf(q) !== -1) {
-                            searchFilesModel.append(fl);
-                            if (!selectedSearchItem) selectedSearchItem = fl;
+                            var fWithScore = Object.assign({}, fl, { score: SearchEngine.getItemScore(fl.name, q) });
+                            matchedFiles.push(fWithScore);
+                            allCandidates.push(fWithScore);
                         }
                     }
+                    matchedFiles.sort(function(a, b) { return b.score - a.score; });
+                    for (var n = 0; n < matchedFiles.length; n++) {
+                        searchFilesModel.append(matchedFiles[n]);
+                    }
 
+                    // 3. Gather Tools
                     var tools = SearchDB.searchDb.tools || [];
+                    var matchedTools = [];
                     for (var k = 0; k < tools.length; k++) {
                         var t = tools[k];
                         if (t.name.toLowerCase().indexOf(q) !== -1 || t.desc.toLowerCase().indexOf(q) !== -1 || t.category.toLowerCase().indexOf(q) !== -1) {
-                            searchToolsModel.append(t);
-                            if (!selectedSearchItem) selectedSearchItem = t;
+                            var tWithScore = Object.assign({}, t, { score: SearchEngine.getItemScore(t.name, q) });
+                            matchedTools.push(tWithScore);
+                            allCandidates.push(tWithScore);
                         }
+                    }
+                    matchedTools.sort(function(a, b) { return b.score - a.score; });
+                    for (var p = 0; p < matchedTools.length; p++) {
+                        searchToolsModel.append(matchedTools[p]);
+                    }
+
+                    // 4. Calculate Predictive Autocomplete (knows what user will type next)
+                    var topPred = SearchEngine.getTopPrediction(q, allCandidates);
+                    if (topPred) {
+                        topPredictedItem = topPred;
+                        selectedSearchItem = topPred;
+                        var rawName = topPred.name;
+                        if (rawName.toLowerCase().indexOf(q) === 0) {
+                            searchPredictionSuffix = rawName.substring(q.length);
+                        }
+                    } else if (searchAppsModel.count > 0) {
+                        selectedSearchItem = searchAppsModel.get(0);
+                    } else if (searchFilesModel.count > 0) {
+                        selectedSearchItem = searchFilesModel.get(0);
+                    } else if (searchToolsModel.count > 0) {
+                        selectedSearchItem = searchToolsModel.get(0);
                     }
                 }
 
@@ -577,27 +634,49 @@ PlasmoidItem {
                                         opacity: 0.8
                                     }
 
-                                    QQC2.TextField {
-                                        id: searchInput
+                                    Item {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        placeholderText: "Type here to search apps, files and settings..."
-                                        placeholderTextColor: "#a2abbd"
-                                        color: "white"
-                                        font.pixelSize: 14
-                                        font.family: "Segoe UI"
-                                        background: Item {}
-                                        onTextChanged: {
-                                            fullScope.performInstantSearch(text);
-                                            runnerModel.query = text;
+
+                                        // Ghost Autocompletion Text (Predicts what user intends to type based on history)
+                                        Text {
+                                            anchors.left: parent.left
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            visible: searchInput.text.length > 0 && fullScope.searchPredictionSuffix.length > 0
+                                            text: searchInput.text + fullScope.searchPredictionSuffix
+                                            color: Qt.rgba(1, 1, 1, 0.35)
+                                            font.pixelSize: 14
+                                            font.family: "Segoe UI"
                                         }
-                                        Keys.onReturnPressed: {
-                                            if (fullScope.selectedSearchItem) {
-                                                root.launchCommand(fullScope.selectedSearchItem.cmd);
-                                                popDialog.requestClose();
-                                            } else if (runnerModel.count > 0) {
-                                                runnerModel.trigger(0, "", null);
-                                                popDialog.requestClose();
+
+                                        QQC2.TextField {
+                                            id: searchInput
+                                            anchors.fill: parent
+                                            placeholderText: "Type here to search apps, files and settings..."
+                                            placeholderTextColor: "#a2abbd"
+                                            color: "white"
+                                            font.pixelSize: 14
+                                            font.family: "Segoe UI"
+                                            background: Item {}
+                                            onTextChanged: {
+                                                fullScope.performInstantSearch(text);
+                                                runnerModel.query = text;
+                                            }
+                                            Keys.onTabPressed: {
+                                                if (fullScope.searchPredictionSuffix.length > 0) {
+                                                    text = text + fullScope.searchPredictionSuffix;
+                                                    cursorPosition = text.length;
+                                                }
+                                            }
+                                            Keys.onReturnPressed: {
+                                                if (fullScope.topPredictedItem) {
+                                                    fullScope.recordAndLaunch(fullScope.topPredictedItem);
+                                                } else if (fullScope.selectedSearchItem) {
+                                                    fullScope.recordAndLaunch(fullScope.selectedSearchItem);
+                                                } else if (runnerModel.count > 0) {
+                                                    runnerModel.trigger(0, "", null);
+                                                    popDialog.requestClose();
+                                                }
                                             }
                                         }
                                     }
@@ -760,7 +839,7 @@ PlasmoidItem {
                                                                     var rIdx = parseInt(model.cmd.split(":")[1]);
                                                                     runnerModel.trigger(rIdx, "", null);
                                                                 } else {
-                                                                    root.launchCommand(model.cmd);
+                                                                    fullScope.recordAndLaunch(model);
                                                                 }
                                                                 popDialog.requestClose();
                                                             }
@@ -843,7 +922,7 @@ PlasmoidItem {
                                                                     var rIdx = parseInt(model.cmd.split(":")[1]);
                                                                     runnerModel.trigger(rIdx, "", null);
                                                                 } else {
-                                                                    root.launchCommand(model.cmd);
+                                                                    fullScope.recordAndLaunch(model);
                                                                 }
                                                                 popDialog.requestClose();
                                                             }
@@ -926,7 +1005,7 @@ PlasmoidItem {
                                                                     var rIdx = parseInt(model.cmd.split(":")[1]);
                                                                     runnerModel.trigger(rIdx, "", null);
                                                                 } else {
-                                                                    root.launchCommand(model.cmd);
+                                                                    fullScope.recordAndLaunch(model);
                                                                 }
                                                                 popDialog.requestClose();
                                                             }
@@ -1105,7 +1184,7 @@ PlasmoidItem {
                                                         }
                                                         appContextMenu.popup();
                                                     } else {
-                                                        root.launchCommand(model.cmd);
+                                                        fullScope.recordAndLaunch(model);
                                                         popDialog.requestClose();
                                                     }
                                                 }
@@ -1285,7 +1364,7 @@ PlasmoidItem {
                                                                 };
                                                                 appContextMenu.popup();
                                                             } else {
-                                                                root.launchCommand(model.cmd);
+                                                                fullScope.recordAndLaunch(model);
                                                             }
                                                         }
                                                     }
