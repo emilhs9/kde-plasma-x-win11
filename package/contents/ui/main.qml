@@ -27,6 +27,14 @@ PlasmoidItem {
         id: runnerModel
         appletInterface: root
     }
+    Connections {
+        target: runnerModel
+        function onCountChanged() {
+            if (fullScope.isSearching) {
+                fullScope.performInstantSearch(searchInput.text);
+            }
+        }
+    }
 
     // Full Application Model with Linux XDG Categories
     ListModel {
@@ -292,12 +300,37 @@ PlasmoidItem {
 
                     if (q.length === 0) return;
 
+                    // 1. In-memory / scanned database search
                     var apps = SearchDB.searchDb.apps || [];
+                    var addedAppNames = {};
                     for (var i = 0; i < apps.length; i++) {
                         var a = apps[i];
                         if (a.name.toLowerCase().indexOf(q) !== -1 || a.desc.toLowerCase().indexOf(q) !== -1 || a.category.toLowerCase().indexOf(q) !== -1) {
                             searchAppsModel.append(a);
+                            addedAppNames[a.name.toLowerCase()] = true;
                             if (!selectedSearchItem) selectedSearchItem = a;
+                        }
+                    }
+
+                    // 2. Dynamic live system RunnerModel integration (automatically catches any newly installed app)
+                    if (runnerModel && runnerModel.count > 0) {
+                        for (var r = 0; r < runnerModel.count; r++) {
+                            var rName = runnerModel.data(runnerModel.index(r, 0), Qt.DisplayRole) || "";
+                            var rIcon = runnerModel.data(runnerModel.index(r, 0), Qt.DecorationRole) || "application-x-executable";
+                            if (typeof rIcon === "object" && rIcon.name) rIcon = rIcon.name;
+                            if (rName.length > 0 && !addedAppNames[rName.toLowerCase()]) {
+                                var dynamicApp = {
+                                    "name": rName,
+                                    "icon": rIcon ? rIcon.toString() : "application-x-executable",
+                                    "cmd": "krunner_trigger:" + r,
+                                    "desc": "System Application",
+                                    "category": "System",
+                                    "type": "app"
+                                };
+                                searchAppsModel.append(dynamicApp);
+                                addedAppNames[rName.toLowerCase()] = true;
+                                if (!selectedSearchItem) selectedSearchItem = dynamicApp;
+                            }
                         }
                     }
 
@@ -723,7 +756,12 @@ PlasmoidItem {
                                                             cursorShape: Qt.PointingHandCursor
                                                             onEntered: fullScope.selectedSearchItem = model
                                                             onClicked: {
-                                                                root.launchCommand(model.cmd);
+                                                                if (model.cmd && model.cmd.indexOf("krunner_trigger:") === 0) {
+                                                                    var rIdx = parseInt(model.cmd.split(":")[1]);
+                                                                    runnerModel.trigger(rIdx, "", null);
+                                                                } else {
+                                                                    root.launchCommand(model.cmd);
+                                                                }
                                                                 popDialog.requestClose();
                                                             }
                                                         }
@@ -801,7 +839,12 @@ PlasmoidItem {
                                                             cursorShape: Qt.PointingHandCursor
                                                             onEntered: fullScope.selectedSearchItem = model
                                                             onClicked: {
-                                                                root.launchCommand(model.cmd);
+                                                                if (model.cmd && model.cmd.indexOf("krunner_trigger:") === 0) {
+                                                                    var rIdx = parseInt(model.cmd.split(":")[1]);
+                                                                    runnerModel.trigger(rIdx, "", null);
+                                                                } else {
+                                                                    root.launchCommand(model.cmd);
+                                                                }
                                                                 popDialog.requestClose();
                                                             }
                                                         }
@@ -879,7 +922,12 @@ PlasmoidItem {
                                                             cursorShape: Qt.PointingHandCursor
                                                             onEntered: fullScope.selectedSearchItem = model
                                                             onClicked: {
-                                                                root.launchCommand(model.cmd);
+                                                                if (model.cmd && model.cmd.indexOf("krunner_trigger:") === 0) {
+                                                                    var rIdx = parseInt(model.cmd.split(":")[1]);
+                                                                    runnerModel.trigger(rIdx, "", null);
+                                                                } else {
+                                                                    root.launchCommand(model.cmd);
+                                                                }
                                                                 popDialog.requestClose();
                                                             }
                                                         }

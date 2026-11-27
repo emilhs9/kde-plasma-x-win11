@@ -3,251 +3,327 @@
 var searchDb = {
   "apps": [
     {
-      "name": "Ente Auth",
-      "icon": "/home/sir/.local/share/ente-auth/ente-auth.png",
-      "cmd": "/home/sir/.local/share/ente-auth/ente-auth-v4.4.27-x86_64.AppImage",
-      "desc": "2FA Authenticator • Security",
-      "category": "Utilities",
-      "type": "app"
-    },
-    {
       "name": "Ark",
       "icon": "ark",
       "cmd": "ark",
-      "desc": "Archiving Tool",
+      "desc": "Work with file archives",
       "category": "Utilities",
+      "desktop": "/usr/share/applications/org.kde.ark.desktop",
       "type": "app"
     },
     {
-      "name": "Brave Web Browser",
+      "name": "Brave",
       "icon": "com.brave.Browser",
-      "cmd": "flatpak run com.brave.Browser",
-      "desc": "Fast & Secure Web Browser",
+      "cmd": "/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser @@u",
+      "desc": "Access the Internet",
       "category": "Internet",
+      "desktop": "/var/lib/flatpak/exports/share/applications/com.brave.Browser.desktop",
       "type": "app"
     },
     {
       "name": "CMake",
       "icon": "CMakeSetup",
       "cmd": "cmake-gui",
-      "desc": "Cross-platform build system",
+      "desc": "Cross-platform buildsystem",
       "category": "Development",
+      "desktop": "/usr/share/applications/cmake-gui.desktop",
       "type": "app"
     },
     {
       "name": "Crashed Processes Viewer",
       "icon": "tools-report-bug",
       "cmd": "drkonqi-coredump-gui",
-      "desc": "Crash reports inspection",
+      "desc": "Offers detailed view of past crashes",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.drkonqi.coredump.gui.desktop",
       "type": "app"
     },
     {
       "name": "Discord",
       "icon": "discord",
-      "cmd": "discord",
-      "desc": "Voice and Text Chat",
+      "cmd": "/usr/bin/discord --url --",
+      "desc": "All-in-one voice and text chat for gamers that's free, secure, and works on both your desktop and phone.",
       "category": "Internet",
+      "desktop": "/usr/share/applications/discord.desktop",
       "type": "app"
     },
     {
       "name": "Discover",
       "icon": "plasmadiscover",
       "cmd": "plasma-discover",
-      "desc": "Software Center",
+      "desc": "Install and remove apps and add-ons",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.discover.desktop",
       "type": "app"
     },
     {
       "name": "Dolphin",
       "icon": "org.kde.dolphin",
       "cmd": "dolphin",
-      "desc": "File Manager",
+      "desc": "Manage your files",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.dolphin.desktop",
       "type": "app"
     },
     {
       "name": "Emoji Selector",
       "icon": "preferences-desktop-emoticons",
       "cmd": "plasma-emojier",
-      "desc": "Pick emoji characters",
+      "desc": "Copy emojis to the clipboard",
       "category": "Utilities",
+      "desktop": "/usr/share/applications/org.kde.plasma.emojier.desktop",
+      "type": "app"
+    },
+    {
+      "name": "Ente Auth",
+      "icon": "/home/sir/.local/share/ente-auth/ente-auth.png",
+      "cmd": "/home/sir/.local/share/ente-auth/ente-auth-v4.4.27-x86_64.AppImage",
+      "desc": "2FA Authenticator by Ente",
+      "category": "Utilities",
+      "desktop": "/home/sir/.local/share/applications/ente-auth.desktop",
+      "type": "app"
+    },
+    {
+      "name": "Google Antigravity",
+      "icon": "/home/sir/.local/share/icons/antigravity.png",
+      "cmd": "/home/sir/Downloads/Antigravity-IDE/antigravity-ide --no-sandbox --disable-gpu --ozone-platform=x11",
+      "desc": "AI Coding IDE",
+      "category": "Development",
+      "desktop": "/home/sir/.local/share/applications/antigravity.desktop",
       "type": "app"
     },
     {
       "name": "Hardware Locality lstopo",
       "icon": "hwloc",
       "cmd": "lstopo",
-      "desc": "Hardware topology viewer",
+      "desc": "Show hardware topology",
       "category": "System",
+      "desktop": "/usr/share/applications/lstopo.desktop",
       "type": "app"
     },
     {
       "name": "Htop",
       "icon": "htop",
-      "cmd": "konsole -e htop",
-      "desc": "Process Viewer",
+      "cmd": "htop",
+      "desc": "Show System Processes",
       "category": "System",
+      "desktop": "/usr/share/applications/htop.desktop",
       "type": "app"
     },
     {
       "name": "Info Center",
       "icon": "hwinfo",
       "cmd": "kinfocenter",
-      "desc": "Centralized system information",
+      "desc": "Learn about the system's hardware and status",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.kinfocenter.desktop",
       "type": "app"
     },
     {
-      "name": "Kitty",
+      "name": "KDE System Settings",
+      "icon": "preferences-system",
+      "cmd": "systemsettings",
+      "desc": "Configure KDE Plasma\u2019s behavior and appearance",
+      "category": "Settings",
+      "desktop": "/usr/share/applications/kdesystemsettings.desktop",
+      "type": "app"
+    },
+    {
+      "name": "kitty",
       "icon": "kitty",
       "cmd": "kitty",
-      "desc": "GPU-accelerated terminal",
+      "desc": "Fast, feature-rich, GPU based terminal",
       "category": "System",
+      "desktop": "/usr/share/applications/kitty.desktop",
       "type": "app"
     },
     {
       "name": "Konsole",
       "icon": "utilities-terminal",
       "cmd": "konsole",
-      "desc": "Terminal Emulator",
+      "desc": "Use the command line",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.konsole.desktop",
+      "type": "app"
+    },
+    {
+      "name": "Manage Printing",
+      "icon": "cups",
+      "cmd": "xdg-open http://localhost:631/",
+      "desc": "CUPS Web Interface",
+      "category": "System",
+      "desktop": "/usr/share/applications/cups.desktop",
       "type": "app"
     },
     {
       "name": "Menu Editor",
       "icon": "kmenuedit",
       "cmd": "kmenuedit",
-      "desc": "Application launcher menu editor",
+      "desc": "Edit how applications are presented in app launchers",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.kmenuedit.desktop",
+      "type": "app"
+    },
+    {
+      "name": "Print Settings",
+      "icon": "printer",
+      "cmd": "system-config-printer",
+      "desc": "Configure printers",
+      "category": "System",
+      "desktop": "/usr/share/applications/system-config-printer.desktop",
       "type": "app"
     },
     {
       "name": "Qt Assistant",
       "icon": "assistant",
       "cmd": "assistant6",
-      "desc": "Qt documentation reader",
+      "desc": "View documentation in Qt help file format",
       "category": "Development",
+      "desktop": "/usr/share/applications/assistant.desktop",
       "type": "app"
     },
     {
       "name": "Qt D-Bus Viewer",
       "icon": "qdbusviewer",
       "cmd": "qdbusviewer6",
-      "desc": "D-Bus introspection utility",
+      "desc": "Debug D-Bus applications",
       "category": "Development",
+      "desktop": "/usr/share/applications/qdbusviewer.desktop",
       "type": "app"
     },
     {
       "name": "Qt Linguist",
       "icon": "linguist",
       "cmd": "linguist6",
-      "desc": "Translation management tool",
+      "desc": "Add translations to Qt applications",
       "category": "Development",
+      "desktop": "/usr/share/applications/linguist.desktop",
       "type": "app"
     },
     {
       "name": "Qt V4L2 test Utility",
       "icon": "qv4l2",
       "cmd": "qv4l2",
-      "desc": "Video test tool",
+      "desc": "Allow testing Video4Linux devices",
       "category": "Multimedia",
+      "desktop": "/usr/share/applications/qv4l2.desktop",
       "type": "app"
     },
     {
-      "name": "Qt V4L2 video capture",
+      "name": "Qt V4L2 video capture utility",
       "icon": "qvidcap",
       "cmd": "qvidcap",
-      "desc": "Video capture utility",
+      "desc": "Viewer for video capture",
       "category": "Multimedia",
+      "desktop": "/usr/share/applications/qvidcap.desktop",
       "type": "app"
     },
     {
       "name": "Qt Widgets Designer",
       "icon": "designer",
       "cmd": "designer6",
-      "desc": "GUI designer for Qt",
+      "desc": "Design GUIs for Qt applications",
       "category": "Development",
+      "desktop": "/usr/share/applications/designer.desktop",
       "type": "app"
     },
     {
       "name": "Rofi",
       "icon": "rofi",
-      "cmd": "rofi -show drun",
-      "desc": "Window switcher & app launcher",
+      "cmd": "rofi -show",
+      "desc": "Utilities \u2022 Application",
       "category": "Utilities",
+      "desktop": "/usr/share/applications/rofi.desktop",
+      "type": "app"
+    },
+    {
+      "name": "Rofi Theme Selector",
+      "icon": "rofi",
+      "cmd": "rofi-theme-selector",
+      "desc": "Utilities \u2022 Application",
+      "category": "Utilities",
+      "desktop": "/usr/share/applications/rofi-theme-selector.desktop",
       "type": "app"
     },
     {
       "name": "Spectacle",
       "icon": "spectacle",
-      "cmd": "spectacle",
-      "desc": "Screenshot Capture Utility",
+      "cmd": "/usr/bin/spectacle",
+      "desc": "Take screenshots and screen recordings",
       "category": "Utilities",
+      "desktop": "/usr/share/applications/org.kde.spectacle.desktop",
       "type": "app"
     },
     {
       "name": "System Monitor",
       "icon": "utilities-system-monitor",
       "cmd": "plasma-systemmonitor",
-      "desc": "View processes and system health",
+      "desc": "Monitor app and system resource usage",
       "category": "System",
+      "desktop": "/usr/share/applications/org.kde.plasma-systemmonitor.desktop",
       "type": "app"
     },
     {
       "name": "System Settings",
       "icon": "preferences-system",
       "cmd": "systemsettings",
-      "desc": "KDE plasma configuration",
+      "desc": "Configure the system\u2019s behavior and appearance",
       "category": "Settings",
+      "desktop": "/usr/share/applications/systemsettings.desktop",
       "type": "app"
     },
     {
-      "name": "Vim Editor",
+      "name": "uuctl",
+      "icon": "applications-system",
+      "cmd": "uuctl",
+      "desc": "Select and perform actions on user systemd units",
+      "category": "Settings",
+      "desktop": "/usr/share/applications/uuctl.desktop",
+      "type": "app"
+    },
+    {
+      "name": "Vim",
       "icon": "gvim",
-      "cmd": "konsole -e vim",
-      "desc": "Advanced text editor",
+      "cmd": "vim",
+      "desc": "Edit text files",
       "category": "Utilities",
+      "desktop": "/usr/share/applications/vim.desktop",
       "type": "app"
     },
     {
       "name": "Visual Studio Code",
       "icon": "com.visualstudio.code",
-      "cmd": "code",
+      "cmd": "/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=code --file-forwarding com.visualstudio.code @@",
       "desc": "Code Editing. Redefined.",
       "category": "Development",
+      "desktop": "/var/lib/flatpak/exports/share/applications/com.visualstudio.code.desktop",
       "type": "app"
     },
     {
-      "name": "VLC Media Player",
-      "icon": "vlc",
-      "cmd": "vlc",
-      "desc": "Media player and streamer",
+      "name": "VLC media player",
+      "icon": "org.videolan.VLC",
+      "cmd": "/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/vlc --file-forwarding org.videolan.VLC --started-from-file @@u",
+      "desc": "Read, capture, broadcast your multimedia streams",
       "category": "Multimedia",
+      "desktop": "/var/lib/flatpak/exports/share/applications/org.videolan.VLC.desktop",
       "type": "app"
     },
     {
-      "name": "Kate",
-      "icon": "kate",
-      "cmd": "kate",
-      "desc": "Advanced text editor",
+      "name": "Welcome Center",
+      "icon": "start-here-kde-plasma",
+      "cmd": "plasma-welcome",
+      "desc": "Learn more about KDE Plasma",
       "category": "Utilities",
+      "desktop": "/usr/share/applications/org.kde.plasma-welcome.desktop",
       "type": "app"
     },
     {
-      "name": "KCalc",
-      "icon": "kcalc",
-      "cmd": "kcalc",
-      "desc": "Scientific Calculator",
+      "name": "Winetricks",
+      "icon": "winetricks",
+      "cmd": "winetricks --gui",
+      "desc": "Work around problems and install applications under Wine",
       "category": "Utilities",
-      "type": "app"
-    },
-    {
-      "name": "Gwenview",
-      "icon": "gwenview",
-      "cmd": "gwenview",
-      "desc": "Image Viewer",
-      "category": "Multimedia",
+      "desktop": "/usr/share/applications/winetricks.desktop",
       "type": "app"
     }
   ],
@@ -277,6 +353,15 @@ var searchDb = {
       "location": "Desktop",
       "cmd": "xdg-open \"/home/sir/Desktop/MegaMedusa-main.zip\"",
       "desc": "Desktop \u2022 ZIP",
+      "type": "file"
+    },
+    {
+      "name": "ente-auth.desktop",
+      "icon": "text-plain",
+      "path": "/home/sir/Desktop/ente-auth.desktop",
+      "location": "Desktop",
+      "cmd": "xdg-open \"/home/sir/Desktop/ente-auth.desktop\"",
+      "desc": "Desktop \u2022 DESKTOP",
       "type": "file"
     },
     {
@@ -559,6 +644,15 @@ var searchDb = {
       "type": "file"
     },
     {
+      "name": "ente-auth-v4.4.27.tar.gz",
+      "icon": "package-x-generic",
+      "path": "/home/sir/Downloads/ente-auth-v4.4.27.tar.gz",
+      "location": "Downloads",
+      "cmd": "xdg-open \"/home/sir/Downloads/ente-auth-v4.4.27.tar.gz\"",
+      "desc": "Downloads \u2022 GZ",
+      "type": "file"
+    },
+    {
       "name": "Antigravity IDE.tar.gz",
       "icon": "package-x-generic",
       "path": "/home/sir/Downloads/Antigravity IDE.tar.gz",
@@ -586,110 +680,29 @@ var searchDb = {
       "type": "file"
     },
     {
-      "name": "Screenshot-20261128-011209.png",
+      "name": "Screenshot-20261128-012550.png",
       "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-011209.png",
+      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-012550.png",
       "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-011209.png\"",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-012550.png\"",
       "desc": "Pictures/Screenshots \u2022 PNG",
       "type": "file"
     },
     {
-      "name": "Screenshot-20261127-221624.png",
+      "name": "Screenshot-20261128-012303.png",
       "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-221624.png",
+      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-012303.png",
       "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-221624.png\"",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-012303.png\"",
       "desc": "Pictures/Screenshots \u2022 PNG",
       "type": "file"
     },
     {
-      "name": "Screenshot-20261128-005202.png",
+      "name": "stable_position_test.png",
       "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-005202.png",
+      "path": "/home/sir/Pictures/Screenshots/stable_position_test.png",
       "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-005202.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261128-010218.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-010218.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-010218.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-235757.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-235757.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-235757.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-235728.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-235728.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-235728.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-215332.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-215332.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-215332.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-221950.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-221950.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-221950.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-232159.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-232159.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-232159.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261128-004549.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-004549.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261128-004549.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-225033.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-225033.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-225033.png\"",
-      "desc": "Pictures/Screenshots \u2022 PNG",
-      "type": "file"
-    },
-    {
-      "name": "Screenshot-20261127-230544.png",
-      "icon": "image-x-generic",
-      "path": "/home/sir/Pictures/Screenshots/Screenshot-20261127-230544.png",
-      "location": "Pictures/Screenshots",
-      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/Screenshot-20261127-230544.png\"",
+      "cmd": "xdg-open \"/home/sir/Pictures/Screenshots/stable_position_test.png\"",
       "desc": "Pictures/Screenshots \u2022 PNG",
       "type": "file"
     },
@@ -709,6 +722,15 @@ var searchDb = {
       "location": "Pictures",
       "cmd": "xdg-open \"/home/sir/Pictures/Wallpapers\"",
       "desc": "Pictures \u2022 Folder",
+      "type": "file"
+    },
+    {
+      "name": "win11-startmenu",
+      "icon": "folder",
+      "path": "/home/sir/Documents/win11-startmenu",
+      "location": "Documents",
+      "cmd": "xdg-open \"/home/sir/Documents/win11-startmenu\"",
+      "desc": "Documents \u2022 Folder",
       "type": "file"
     }
   ],
