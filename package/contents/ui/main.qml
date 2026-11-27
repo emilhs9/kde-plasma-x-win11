@@ -1469,8 +1469,8 @@ PlasmoidItem {
                                                         Layout.preferredHeight: 52
                                                         Layout.minimumHeight: 44
                                                         radius: 7
-                                                        color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.05)
-                                                        border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : Qt.rgba(1, 1, 1, 0.08)
+                                                        color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+                                                        border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : "transparent"
 
                                                         RowLayout {
                                                             anchors.fill: parent
