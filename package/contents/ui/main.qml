@@ -1255,7 +1255,7 @@ PlasmoidItem {
                                     anchors.fill: parent
                                     anchors.leftMargin: 24
                                     anchors.rightMargin: 20
-                                    anchors.bottomMargin: 14
+                                    anchors.bottomMargin: 5
                                     visible: !fullScope.isSearching && !fullScope.showAllApps
                                     spacing: 8
 
@@ -1431,11 +1431,14 @@ PlasmoidItem {
                                         }
                                     }
 
-                                    // Activity Section Header (More/Less button removed)
+                                    Item { Layout.fillHeight: true }
+
+                                    // Recommended Section Header
                                     RowLayout {
                                         Layout.fillWidth: true
+                                        Layout.bottomMargin: 4
                                         Text {
-                                            text: "Fəaliyyətlər və Girişlər"
+                                            text: "Recommended"
                                             color: "white"
                                             font.pixelSize: 13
                                             font.weight: Font.DemiBold
@@ -1443,10 +1446,9 @@ PlasmoidItem {
                                         Item { Layout.fillWidth: true }
                                     }
 
-                                    // 4-Column Activity Dashboard: Əməliyyatlar, Girilən Yerlər, Yüklənənlər, Açılanlar
+                                    // 4-Column Activity Grid: Clean boxes without category names
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Layout.bottomMargin: 14
                                         spacing: 8
 
                                         Repeater {
@@ -1455,89 +1457,65 @@ PlasmoidItem {
                                             delegate: ColumnLayout {
                                                 Layout.fillWidth: true
                                                 Layout.preferredWidth: 1
-                                                spacing: 5
+                                                spacing: 4
 
-                                                // Column Header
-                                                RowLayout {
-                                                    spacing: 4
-                                                    Kirigami.Icon {
-                                                        source: modelData.icon || "folder"
-                                                        Layout.preferredWidth: 13
-                                                        Layout.preferredHeight: 13
-                                                    }
-                                                    Text {
-                                                        text: modelData.title
-                                                        color: modelData.color || "#38bdf8"
-                                                        font.pixelSize: 10
-                                                        font.weight: Font.Bold
-                                                        font.letterSpacing: 0.3
-                                                        elide: Text.ElideRight
-                                                    }
-                                                }
+                                                Repeater {
+                                                    model: modelData.items
 
-                                                // Column Items
-                                                ColumnLayout {
-                                                    Layout.fillWidth: true
-                                                    spacing: 2
+                                                    delegate: Rectangle {
+                                                        Layout.fillWidth: true
+                                                        Layout.preferredHeight: 35
+                                                        radius: 6
+                                                        color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.04)
+                                                        border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
 
-                                                    Repeater {
-                                                        model: modelData.items
+                                                        RowLayout {
+                                                            anchors.fill: parent
+                                                            anchors.leftMargin: 6
+                                                            anchors.rightMargin: 6
+                                                            spacing: 7
 
-                                                        delegate: Rectangle {
-                                                            Layout.fillWidth: true
-                                                            Layout.preferredHeight: 33
-                                                            radius: 6
-                                                            color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.04)
-                                                            border.color: colItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.22) : "transparent"
-
-                                                            RowLayout {
-                                                                anchors.fill: parent
-                                                                anchors.leftMargin: 5
-                                                                anchors.rightMargin: 5
-                                                                spacing: 6
-
-                                                                Kirigami.Icon {
-                                                                    source: modelData.icon || "document-open"
-                                                                    Layout.preferredWidth: 15
-                                                                    Layout.preferredHeight: 15
-                                                                }
-
-                                                                ColumnLayout {
-                                                                    Layout.fillWidth: true
-                                                                    spacing: 1
-
-                                                                    Text {
-                                                                        text: modelData.name
-                                                                        color: "white"
-                                                                        font.pixelSize: 10
-                                                                        font.weight: Font.Medium
-                                                                        elide: Text.ElideRight
-                                                                        Layout.fillWidth: true
-                                                                    }
-
-                                                                    Text {
-                                                                        text: modelData.desc
-                                                                        color: "#a2abbd"
-                                                                        font.pixelSize: 8
-                                                                        elide: Text.ElideRight
-                                                                        Layout.fillWidth: true
-                                                                    }
-                                                                }
+                                                            Kirigami.Icon {
+                                                                source: modelData.icon || "document-open"
+                                                                Layout.preferredWidth: 16
+                                                                Layout.preferredHeight: 16
                                                             }
 
-                                                            MouseArea {
-                                                                id: colItemMouse
-                                                                anchors.fill: parent
-                                                                hoverEnabled: true
-                                                                cursorShape: Qt.PointingHandCursor
-                                                                onClicked: {
-                                                                    if (modelData.cmd) {
-                                                                        root.launchCommand(modelData.cmd);
-                                                                    } else if (modelData.path) {
-                                                                        root.launchCommand("xdg-open '" + modelData.path + "'");
-                                                                    }
-                                                                    popDialog.requestClose();
+                                                            ColumnLayout {
+                                                                Layout.fillWidth: true
+                                                                spacing: 1
+
+                                                                Text {
+                                                                    text: modelData.name
+                                                                    color: "white"
+                                                                    font.pixelSize: 10
+                                                                    font.weight: Font.Medium
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
                                                                 }
+
+                                                                Text {
+                                                                    text: modelData.desc
+                                                                    color: "#a2abbd"
+                                                                    font.pixelSize: 8
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: colItemMouse
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onClicked: {
+                                                                if (modelData.cmd) {
+                                                                    root.launchCommand(modelData.cmd);
+                                                                } else if (modelData.path) {
+                                                                    root.launchCommand("xdg-open '" + modelData.path + "'");
+                                                                }
+                                                                popDialog.requestClose();
                                                             }
                                                         }
                                                     }
@@ -1545,8 +1523,6 @@ PlasmoidItem {
                                             }
                                         }
                                     }
-
-                                    Item { Layout.fillHeight: true }
                                 }
                             }
 
