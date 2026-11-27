@@ -3,6 +3,14 @@
 var searchDb = {
   "apps": [
     {
+      "name": "Ente Auth",
+      "icon": "/home/sir/.local/share/ente-auth/ente-auth.png",
+      "cmd": "/home/sir/.local/share/ente-auth/ente-auth-v4.4.27-x86_64.AppImage",
+      "desc": "2FA Authenticator • Security",
+      "category": "Utilities",
+      "type": "app"
+    },
+    {
       "name": "Ark",
       "icon": "ark",
       "cmd": "ark",
