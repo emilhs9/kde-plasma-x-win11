@@ -1291,11 +1291,11 @@ PlasmoidItem {
                                         }
                                     }
 
-                                    // Pinned 6-Column Grid (Expands from 2 rows to 3 rows when More is clicked)
+                                    // Pinned 6-Column Grid (4 rows of 6 applications = 24 pinned apps)
                                     GridLayout {
                                         Layout.fillWidth: true
                                         columns: 6
-                                        rowSpacing: 6
+                                        rowSpacing: 4
                                         columnSpacing: 6
 
                                         Repeater {
@@ -1315,20 +1315,27 @@ PlasmoidItem {
                                                 ListElement { name: "Text Editor"; icon: "accessories-text-editor"; cmd: "kate"; extra: false; desktop: "" }
                                                 ListElement { name: "About KDE"; icon: "kde"; cmd: "kinfocenter"; extra: false; desktop: "/usr/share/applications/org.kde.kinfocenter.desktop" }
                                                 ListElement { name: "System Monitor"; icon: "utilities-system-monitor"; cmd: "plasma-systemmonitor"; extra: false; desktop: "/usr/share/applications/org.kde.plasma-systemmonitor.desktop" }
-                                                // Row 3 (Extra Row appearing when More is clicked)
-                                                ListElement { name: "VS Code"; icon: "com.visualstudio.code"; cmd: "flatpak run com.visualstudio.code"; extra: true; desktop: "/var/lib/flatpak/exports/share/applications/com.visualstudio.code.desktop" }
-                                                ListElement { name: "VLC Player"; icon: "vlc"; cmd: "flatpak run org.videolan.VLC"; extra: true; desktop: "/var/lib/flatpak/exports/share/applications/org.videolan.VLC.desktop" }
-                                                ListElement { name: "Htop Monitor"; icon: "htop"; cmd: "konsole -e htop"; extra: true; desktop: "/usr/share/applications/htop.desktop" }
-                                                ListElement { name: "Ark Archive"; icon: "org.kde.ark"; cmd: "ark"; extra: true; desktop: "/usr/share/applications/org.kde.ark.desktop" }
-                                                ListElement { name: "Rofi Launcher"; icon: "rofi"; cmd: "rofi -show drun"; extra: true; desktop: "/usr/share/applications/rofi.desktop" }
-                                                ListElement { name: "Info Center"; icon: "hwinfo"; cmd: "kinfocenter"; extra: true; desktop: "/usr/share/applications/org.kde.kinfocenter.desktop" }
+                                                // Row 3
+                                                ListElement { name: "VS Code"; icon: "com.visualstudio.code"; cmd: "flatpak run com.visualstudio.code"; extra: false; desktop: "/var/lib/flatpak/exports/share/applications/com.visualstudio.code.desktop" }
+                                                ListElement { name: "VLC Player"; icon: "vlc"; cmd: "flatpak run org.videolan.VLC"; extra: false; desktop: "/var/lib/flatpak/exports/share/applications/org.videolan.VLC.desktop" }
+                                                ListElement { name: "Htop Monitor"; icon: "htop"; cmd: "konsole -e htop"; extra: false; desktop: "/usr/share/applications/htop.desktop" }
+                                                ListElement { name: "Ark Archive"; icon: "org.kde.ark"; cmd: "ark"; extra: false; desktop: "/usr/share/applications/org.kde.ark.desktop" }
+                                                ListElement { name: "Rofi Launcher"; icon: "rofi"; cmd: "rofi -show drun"; extra: false; desktop: "/usr/share/applications/rofi.desktop" }
+                                                ListElement { name: "Info Center"; icon: "hwinfo"; cmd: "kinfocenter"; extra: false; desktop: "/usr/share/applications/org.kde.kinfocenter.desktop" }
+                                                // Row 4
+                                                ListElement { name: "Antigravity"; icon: "antigravity"; cmd: "antigravity"; extra: false; desktop: "/home/sir/.local/share/applications/antigravity.desktop" }
+                                                ListElement { name: "Ente Auth"; icon: "/home/sir/.local/share/ente-auth/ente-auth.png"; cmd: "/home/sir/.local/share/ente-auth/ente-auth-v4.4.27-x86_64.AppImage"; extra: false; desktop: "/home/sir/.local/share/applications/ente-auth.desktop" }
+                                                ListElement { name: "CMake GUI"; icon: "CMakeSetup"; cmd: "cmake-gui"; extra: false; desktop: "/usr/share/applications/cmake-gui.desktop" }
+                                                ListElement { name: "Qt Designer"; icon: "designer"; cmd: "designer6"; extra: false; desktop: "/usr/share/applications/designer.desktop" }
+                                                ListElement { name: "GDB Debug"; icon: "utilities-terminal"; cmd: "konsole -e gdb"; extra: false; desktop: "" }
+                                                ListElement { name: "Vim"; icon: "gvim"; cmd: "konsole -e vim"; extra: false; desktop: "/usr/share/applications/vim.desktop" }
                                             }
 
                                             delegate: Item {
                                                 id: pinDelegateRoot
                                                 visible: true
                                                 Layout.preferredWidth: 94
-                                                Layout.preferredHeight: 70
+                                                Layout.preferredHeight: 66
 
                                                 property int itemIndex: index
                                                 property bool isDragging: dragArea.drag.active
@@ -1349,7 +1356,7 @@ PlasmoidItem {
                                                 Rectangle {
                                                     id: pinVisual
                                                     width: 94
-                                                    height: 70
+                                                    height: 66
                                                     radius: 8
                                                     color: (dragArea.drag.active) ? Qt.rgba(0.2, 0.5, 0.9, 0.3) : (dragArea.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent")
                                                     border.color: (dragArea.drag.active) ? "#38bdf8" : (dragArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : "transparent")
@@ -1374,11 +1381,11 @@ PlasmoidItem {
 
                                                     ColumnLayout {
                                                         anchors.centerIn: parent
-                                                        spacing: 4
+                                                        spacing: 3
                                                         Kirigami.Icon {
                                                             source: model.icon
-                                                            Layout.preferredWidth: 38
-                                                            Layout.preferredHeight: 38
+                                                            Layout.preferredWidth: 34
+                                                            Layout.preferredHeight: 34
                                                             Layout.alignment: Qt.AlignHCenter
                                                         }
                                                         Text {

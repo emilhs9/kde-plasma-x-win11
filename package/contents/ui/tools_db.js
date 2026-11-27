@@ -62,12 +62,6 @@ var toolsDb = {
           "desc": "KDE qab\u0131\u011f\u0131n\u0131 yenil\u0259",
           "icon": "view-refresh",
           "cmd": "systemctl --user restart plasma-plasmashell.service"
-        },
-        {
-          "name": "Proses Monitoru",
-          "desc": "Sistem resurslar\u0131",
-          "icon": "utilities-system-monitor",
-          "cmd": "plasma-systemmonitor"
         }
       ]
     },
@@ -93,12 +87,6 @@ var toolsDb = {
           "desc": "~/Desktop/ops",
           "icon": "folder",
           "path": "/home/sir/Desktop/ops"
-        },
-        {
-          "name": "Screenshots",
-          "desc": "~/Pictures/Screenshots",
-          "icon": "folder-pictures-symbolic",
-          "path": "/home/sir/Pictures/Screenshots"
         }
       ]
     },
@@ -124,12 +112,6 @@ var toolsDb = {
           "desc": "Downloads \u2022 EXE",
           "icon": "application-x-ms-dos-executable",
           "path": "/home/sir/Downloads/DiscordCanarySetup.exe"
-        },
-        {
-          "name": "Antigravity-IDE",
-          "desc": "Downloads \u2022 Qovluq",
-          "icon": "folder",
-          "path": "/home/sir/Downloads/Antigravity-IDE"
         }
       ]
     },
@@ -154,13 +136,7 @@ var toolsDb = {
           "name": "Screenshot-2026...",
           "desc": "~/Pictures/Screenshots \u2022 PNG",
           "icon": "image-x-generic",
-          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-021500.png"
-        },
-        {
-          "name": "Screenshot-2026...",
-          "desc": "~/Pictures/Screenshots \u2022 PNG",
-          "icon": "image-x-generic",
-          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-021235.png"
+          "path": "/home/sir/Pictures/Screenshots/Screenshot-20261128-025454.png"
         }
       ]
     }

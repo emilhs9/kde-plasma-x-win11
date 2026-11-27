@@ -348,23 +348,21 @@ for app in all_desktop_apps:
         })
 
 def get_activity_columns():
-    # 1. Operations (Əvvəlki əməliyyatlar)
+    # 1. Operations (Əvvəlki əməliyyatlar - 3 rows)
     ops = [
         {"name": "Pacman Update", "desc": "Sistem yeniləmə", "icon": "system-software-install", "cmd": "konsole -e sudo pacman -Syu"},
         {"name": "Git Status & Log", "desc": "Repo vəziyyəti", "icon": "vcs-git", "cmd": "konsole -e bash -c 'git status; git log -n 5; bash'"},
-        {"name": "Plasma Yenilə", "desc": "KDE qabığını yenilə", "icon": "view-refresh", "cmd": "systemctl --user restart plasma-plasmashell.service"},
-        {"name": "Proses Monitoru", "desc": "Sistem resursları", "icon": "utilities-system-monitor", "cmd": "plasma-systemmonitor"}
+        {"name": "Plasma Yenilə", "desc": "KDE qabığını yenilə", "icon": "view-refresh", "cmd": "systemctl --user restart plasma-plasmashell.service"}
     ]
 
-    # 2. Visited Places (Girilən yerlər)
+    # 2. Visited Places (Girilən yerlər - 3 rows)
     places = [
         {"name": "Downloads", "desc": "~/Downloads", "icon": "folder-download-symbolic", "path": os.path.join(home, "Downloads")},
         {"name": "Documents", "desc": "~/Documents", "icon": "folder-documents-symbolic", "path": os.path.join(home, "Documents")},
-        {"name": "Desktop / Ops", "desc": "~/Desktop/ops", "icon": "folder", "path": os.path.join(home, "Desktop/ops") if os.path.exists(os.path.join(home, "Desktop/ops")) else os.path.join(home, "Desktop")},
-        {"name": "Screenshots", "desc": "~/Pictures/Screenshots", "icon": "folder-pictures-symbolic", "path": os.path.join(home, "Pictures/Screenshots") if os.path.exists(os.path.join(home, "Pictures/Screenshots")) else os.path.join(home, "Pictures")}
+        {"name": "Desktop / Ops", "desc": "~/Desktop/ops", "icon": "folder", "path": os.path.join(home, "Desktop/ops") if os.path.exists(os.path.join(home, "Desktop/ops")) else os.path.join(home, "Desktop")}
     ]
 
-    # 3. Downloads (Yüklənənlər)
+    # 3. Downloads (Yüklənənlər - 3 rows)
     downloads = []
     down_dir = os.path.join(home, "Downloads")
     if os.path.exists(down_dir):
@@ -381,9 +379,9 @@ def get_activity_columns():
                 "icon": icon,
                 "path": f
             })
-            if len(downloads) >= 4: break
+            if len(downloads) >= 3: break
 
-    # 4. Recent Files (Açılanlar - with document diversity)
+    # 4. Recent Files (Açılanlar - 3 rows)
     recent_files = []
     xbel = os.path.join(home, ".local/share/recently-used.xbel")
     seen = set()
@@ -392,8 +390,7 @@ def get_activity_columns():
     curated = [
         (os.path.join(home, "Desktop/Emil_Suleymanli_CV_EN.pdf"), "Emil_CV.pdf", "Desktop • PDF", "application-pdf"),
         (os.path.join(home, "Desktop/ops/proxy.txt"), "proxy.txt", "Desktop/ops • Text", "text-plain"),
-        (os.path.join(home, "Desktop/ops/antigravity-skills.md"), "skills.md", "Desktop/ops • MD", "text-markdown"),
-        (os.path.join(home, "Desktop/games.json"), "games.json", "Desktop • JSON", "application-json")
+        (os.path.join(home, "Desktop/ops/antigravity-skills.md"), "skills.md", "Desktop/ops • MD", "text-markdown")
     ]
     for c_path, c_name, c_desc, c_icon in curated:
         if os.path.exists(c_path):
@@ -424,15 +421,15 @@ def get_activity_columns():
                                 "icon": icon,
                                 "path": p
                             })
-                            if len(recent_files) >= 4: break
+                            if len(recent_files) >= 3: break
         except Exception:
             pass
 
     return [
-        {"title": "Əməliyyatlar", "icon": "utilities-terminal", "color": "#38bdf8", "items": ops},
-        {"title": "Girilən Yerlər", "icon": "folder-open", "color": "#00f2fe", "items": places},
-        {"title": "Yüklənənlər", "icon": "folder-download", "color": "#a78bfa", "items": downloads},
-        {"title": "Açılanlar", "icon": "document-open-recent", "color": "#34d399", "items": recent_files}
+        {"title": "Əməliyyatlar", "icon": "utilities-terminal", "color": "#38bdf8", "items": ops[:3]},
+        {"title": "Girilən Yerlər", "icon": "folder-open", "color": "#00f2fe", "items": places[:3]},
+        {"title": "Yüklənənlər", "icon": "folder-download", "color": "#a78bfa", "items": downloads[:3]},
+        {"title": "Açılanlar", "icon": "document-open-recent", "color": "#34d399", "items": recent_files[:3]}
     ]
 
 output_data = {
