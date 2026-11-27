@@ -299,8 +299,8 @@ PlasmoidItem {
                 var sX = (screen && typeof screen.x !== "undefined") ? screen.x : 0;
                 var sY = (screen && typeof screen.y !== "undefined") ? screen.y : 0;
 
-                // Position X: Centered with 10px shift to the right matching taskbar
-                var targetX = sX + Math.round((sWidth - width) / 2) + 10;
+                // Position X: Exactly centered on screen so left and right margins are equal
+                var targetX = sX + Math.round((sWidth - width) / 2);
 
                 // Position Y: Exactly above the bottom panel with 5px margin
                 var appletY = (appletGlobal && typeof appletGlobal.y !== "undefined" && appletGlobal.y > 0) ? appletGlobal.y : (sY + sHeight - 48);
@@ -1048,7 +1048,7 @@ PlasmoidItem {
                                 ColumnLayout {
                                     anchors.fill: parent
                                     anchors.leftMargin: 24
-                                    anchors.rightMargin: 20
+                                    anchors.rightMargin: 24
                                     visible: !fullScope.isSearching && fullScope.showAllApps
                                     spacing: 8
 
@@ -1224,7 +1224,7 @@ PlasmoidItem {
                                 ColumnLayout {
                                     anchors.fill: parent
                                     anchors.leftMargin: 24
-                                    anchors.rightMargin: 20
+                                    anchors.rightMargin: 24
                                     anchors.bottomMargin: 5
                                     visible: !fullScope.isSearching && !fullScope.showAllApps
                                     spacing: 8
