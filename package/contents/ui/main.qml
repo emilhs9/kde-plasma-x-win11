@@ -299,8 +299,8 @@ PlasmoidItem {
                 var sX = (screen && typeof screen.x !== "undefined") ? screen.x : 0;
                 var sY = (screen && typeof screen.y !== "undefined") ? screen.y : 0;
 
-                // Position X: Exactly centered on screen so left and right margins are equal
-                var targetX = sX + Math.round((sWidth - width) / 2);
+                // Position X: Centered with 15px shift to the right
+                var targetX = sX + Math.round((sWidth - width) / 2) + 15;
 
                 // Position Y: Exactly above the bottom panel with 5px margin
                 var appletY = (appletGlobal && typeof appletGlobal.y !== "undefined" && appletGlobal.y > 0) ? appletGlobal.y : (sY + sHeight - 48);
