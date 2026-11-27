@@ -730,6 +730,33 @@
 
       <!-- LEFT: Pinned Applications & Recommended Files -->
       <div class="left-section" id="leftSection">
+        <!-- 3-COLUMN INSTANT SEARCH VIEW (APPS, FILES, TOOLS) -->
+        <div id="instantSearchView" style="display: none; flex-direction: column; gap: 8px; height: 100%; width: 100%;">
+          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 4px;">
+            <button class="cat-pill active" onclick="setSearchFilter('All')" id="sfAll">All</button>
+            <button class="cat-pill" onclick="setSearchFilter('Apps')" id="sfApps">Apps</button>
+            <button class="cat-pill" onclick="setSearchFilter('Files')" id="sfFiles">Files</button>
+            <button class="cat-pill" onclick="setSearchFilter('Tools')" id="sfTools">Tools</button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; height: calc(100% - 40px); overflow: hidden;">
+            <!-- Column 1: Apps -->
+            <div id="searchColApps" style="display: flex; flex-direction: column; overflow: hidden; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 8px; border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 11px; font-weight: 700; color: #79c0ff; text-transform: uppercase; margin-bottom: 6px;">Apps (<span id="countApps">0</span>)</div>
+              <div id="listApps" style="overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+            <!-- Column 2: Files -->
+            <div id="searchColFiles" style="display: flex; flex-direction: column; overflow: hidden; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 8px; border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 11px; font-weight: 700; color: #7ee787; text-transform: uppercase; margin-bottom: 6px;">Files (<span id="countFiles">0</span>)</div>
+              <div id="listFiles" style="overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+            <!-- Column 3: Tools -->
+            <div id="searchColTools" style="display: flex; flex-direction: column; overflow: hidden; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 8px; border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 11px; font-weight: 700; color: #d2a8ff; text-transform: uppercase; margin-bottom: 6px;">Tools (<span id="countTools">0</span>)</div>
+              <div id="listTools" style="overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- ALL APPS VIEW (Hidden by default, shown when All Apps > is clicked) -->
         <div id="allAppsView" style="display: none; flex-direction: column; gap: 10px; height: 100%;">
           <div class="section-header">
@@ -972,7 +999,111 @@
               });
               document.getElementById('moreBtn').innerText = isMoreExpanded ? '< Less' : 'More >';
             }
-          </script>
+          
+    // Real Search DB for HTML Preview
+    const previewDb = {
+      apps: [
+        { name: "Ark", icon: "icons/archive.svg", desc: "Archiving Tool", cat: "Utilities" },
+        { name: "Brave Web Browser", icon: "icons/browser.svg", desc: "Fast & Secure Web Browser", cat: "Internet" },
+        { name: "CMake", icon: "icons/script.svg", desc: "Cross-platform build system", cat: "Development" },
+        { name: "Discord", icon: "icons/discord.png", desc: "Voice and Text Chat", cat: "Internet" },
+        { name: "Discover", icon: "icons/discover.svg", desc: "Software Center", cat: "System" },
+        { name: "Dolphin", icon: "icons/dolphin.svg", desc: "File Manager", cat: "System" },
+        { name: "Htop", icon: "icons/htop.svg", desc: "Process Viewer", cat: "System" },
+        { name: "Info Center", icon: "icons/sys_about.svg", desc: "Centralized system information", cat: "System" },
+        { name: "Kitty", icon: "icons/kitty.svg", desc: "GPU-accelerated terminal", cat: "System" },
+        { name: "Konsole", icon: "icons/konsole.svg", desc: "Terminal Emulator", cat: "System" },
+        { name: "Spectacle", icon: "icons/spectacle.svg", desc: "Screenshot Capture Utility", cat: "Utilities" },
+        { name: "System Monitor", icon: "icons/system_monitor.svg", desc: "View processes and system health", cat: "System" },
+        { name: "System Settings", icon: "icons/settings.svg", desc: "KDE plasma configuration", cat: "Settings" },
+        { name: "Visual Studio Code", icon: "icons/editor.svg", desc: "Code Editing. Redefined.", cat: "Development" },
+        { name: "VLC Media Player", icon: "icons/sys_vids.svg", desc: "Media player and streamer", cat: "Multimedia" }
+      ],
+      files: [
+        { name: "trendo.pem", icon: "icons/security.svg", desc: "Desktop • PEM Certificate" },
+        { name: "games.json", icon: "icons/doc.svg", desc: "Desktop • JSON Document" },
+        { name: "Emil_Suleymanli_CV_AZ.pdf", icon: "icons/doc.svg", desc: "Desktop • PDF Document" },
+        { name: "Emil_Suleymanli_CV_EN.pdf", icon: "icons/doc.svg", desc: "Desktop • PDF Document" },
+        { name: "MegaMedusa-main.zip", icon: "icons/package.svg", desc: "Desktop • ZIP Archive" },
+        { name: "Antigravity IDE.tar.gz", icon: "icons/package.svg", desc: "Downloads • GZ Archive" },
+        { name: "DiscordCanarySetup.exe", icon: "icons/browser.svg", desc: "Downloads • Executable" },
+        { name: "Screenshot-230544.png", icon: "icons/spectacle.svg", desc: "Pictures/Screenshots • PNG Image" },
+        { name: "proxy.txt", icon: "icons/editor.svg", desc: "Desktop/ops • Text Document" },
+        { name: "antigravity-skills.md", icon: "icons/doc.svg", desc: "Desktop/ops • Markdown Document" }
+      ],
+      tools: [
+        { name: "Nmap Scanner", icon: "icons/network_tool.svg", desc: "Network Exploration & Security Auditing" },
+        { name: "Wireshark Packet Analyzer", icon: "icons/network.svg", desc: "Network Traffic & Protocol Analyzer" },
+        { name: "Burp Suite", icon: "icons/firewall.svg", desc: "Web Application Security Testing" },
+        { name: "Metasploit Framework", icon: "icons/terminal.svg", desc: "Penetration Testing Platform" },
+        { name: "System Settings", icon: "icons/sys_settings.svg", desc: "Configure Hardware & Display" },
+        { name: "Package Manager", icon: "icons/package.svg", desc: "Arch Linux Pacman / AUR" },
+        { name: "About System", icon: "icons/sys_about.svg", desc: "OS & Kernel Information" }
+      ]
+    };
+
+    let activeFilter = 'All';
+
+    window.setSearchFilter = function(filter) {
+      activeFilter = filter;
+      ['All', 'Apps', 'Files', 'Tools'].forEach(f => {
+        const btn = document.getElementById('sf' + f);
+        if (btn) btn.classList.toggle('active', f === filter);
+      });
+      const colApps = document.getElementById('searchColApps');
+      const colFiles = document.getElementById('searchColFiles');
+      const colTools = document.getElementById('searchColTools');
+      if (colApps) colApps.style.display = (filter === 'All' || filter === 'Apps') ? 'flex' : 'none';
+      if (colFiles) colFiles.style.display = (filter === 'All' || filter === 'Files') ? 'flex' : 'none';
+      if (colTools) colTools.style.display = (filter === 'All' || filter === 'Tools') ? 'flex' : 'none';
+    };
+
+    const searchInput = document.getElementById('searchInputPreview');
+    const instantSearchView = document.getElementById('instantSearchView');
+    const pinnedSection = document.getElementById('pinnedSection');
+    const recommendedSection = document.getElementById('recommendedSection');
+    const allAppsView = document.getElementById('allAppsView');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        if (q.length === 0) {
+          if (instantSearchView) instantSearchView.style.display = 'none';
+          if (pinnedSection) pinnedSection.style.display = 'flex';
+          if (recommendedSection) recommendedSection.style.display = 'flex';
+          return;
+        }
+
+        if (instantSearchView) instantSearchView.style.display = 'flex';
+        if (pinnedSection) pinnedSection.style.display = 'none';
+        if (recommendedSection) recommendedSection.style.display = 'none';
+        if (allAppsView) allAppsView.style.display = 'none';
+
+        const matchedApps = previewDb.apps.filter(a => a.name.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));
+        const matchedFiles = previewDb.files.filter(f => f.name.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q));
+        const matchedTools = previewDb.tools.filter(t => t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q));
+
+        document.getElementById('countApps').innerText = matchedApps.length;
+        document.getElementById('countFiles').innerText = matchedFiles.length;
+        document.getElementById('countTools').innerText = matchedTools.length;
+
+        const renderItem = (item) => `
+          <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: 0.1s; background: rgba(255,255,255,0.03);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+            <img src="${item.icon}" style="width: 22px; height: 22px; object-fit: contain;">
+            <div style="display: flex; flex-direction: column; overflow: hidden;">
+              <span style="font-size: 11px; font-weight: 600; color: white; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${item.name}</span>
+              <span style="font-size: 9px; color: #9aa3b2; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${item.desc}</span>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('listApps').innerHTML = matchedApps.map(renderItem).join('') || '<div style="font-size: 11px; color: #6e7681; padding: 8px;">No apps found</div>';
+        document.getElementById('listFiles').innerHTML = matchedFiles.map(renderItem).join('') || '<div style="font-size: 11px; color: #6e7681; padding: 8px;">No files found</div>';
+        document.getElementById('listTools').innerHTML = matchedTools.map(renderItem).join('') || '<div style="font-size: 11px; color: #6e7681; padding: 8px;">No tools found</div>';
+      });
+    }
+
+</script>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
             <div
               style="display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: transparent; cursor: pointer; transition: background 0.15s;"
@@ -1467,7 +1598,111 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
-  </script>
+  
+    // Real Search DB for HTML Preview
+    const previewDb = {
+      apps: [
+        { name: "Ark", icon: "icons/archive.svg", desc: "Archiving Tool", cat: "Utilities" },
+        { name: "Brave Web Browser", icon: "icons/browser.svg", desc: "Fast & Secure Web Browser", cat: "Internet" },
+        { name: "CMake", icon: "icons/script.svg", desc: "Cross-platform build system", cat: "Development" },
+        { name: "Discord", icon: "icons/discord.png", desc: "Voice and Text Chat", cat: "Internet" },
+        { name: "Discover", icon: "icons/discover.svg", desc: "Software Center", cat: "System" },
+        { name: "Dolphin", icon: "icons/dolphin.svg", desc: "File Manager", cat: "System" },
+        { name: "Htop", icon: "icons/htop.svg", desc: "Process Viewer", cat: "System" },
+        { name: "Info Center", icon: "icons/sys_about.svg", desc: "Centralized system information", cat: "System" },
+        { name: "Kitty", icon: "icons/kitty.svg", desc: "GPU-accelerated terminal", cat: "System" },
+        { name: "Konsole", icon: "icons/konsole.svg", desc: "Terminal Emulator", cat: "System" },
+        { name: "Spectacle", icon: "icons/spectacle.svg", desc: "Screenshot Capture Utility", cat: "Utilities" },
+        { name: "System Monitor", icon: "icons/system_monitor.svg", desc: "View processes and system health", cat: "System" },
+        { name: "System Settings", icon: "icons/settings.svg", desc: "KDE plasma configuration", cat: "Settings" },
+        { name: "Visual Studio Code", icon: "icons/editor.svg", desc: "Code Editing. Redefined.", cat: "Development" },
+        { name: "VLC Media Player", icon: "icons/sys_vids.svg", desc: "Media player and streamer", cat: "Multimedia" }
+      ],
+      files: [
+        { name: "trendo.pem", icon: "icons/security.svg", desc: "Desktop • PEM Certificate" },
+        { name: "games.json", icon: "icons/doc.svg", desc: "Desktop • JSON Document" },
+        { name: "Emil_Suleymanli_CV_AZ.pdf", icon: "icons/doc.svg", desc: "Desktop • PDF Document" },
+        { name: "Emil_Suleymanli_CV_EN.pdf", icon: "icons/doc.svg", desc: "Desktop • PDF Document" },
+        { name: "MegaMedusa-main.zip", icon: "icons/package.svg", desc: "Desktop • ZIP Archive" },
+        { name: "Antigravity IDE.tar.gz", icon: "icons/package.svg", desc: "Downloads • GZ Archive" },
+        { name: "DiscordCanarySetup.exe", icon: "icons/browser.svg", desc: "Downloads • Executable" },
+        { name: "Screenshot-230544.png", icon: "icons/spectacle.svg", desc: "Pictures/Screenshots • PNG Image" },
+        { name: "proxy.txt", icon: "icons/editor.svg", desc: "Desktop/ops • Text Document" },
+        { name: "antigravity-skills.md", icon: "icons/doc.svg", desc: "Desktop/ops • Markdown Document" }
+      ],
+      tools: [
+        { name: "Nmap Scanner", icon: "icons/network_tool.svg", desc: "Network Exploration & Security Auditing" },
+        { name: "Wireshark Packet Analyzer", icon: "icons/network.svg", desc: "Network Traffic & Protocol Analyzer" },
+        { name: "Burp Suite", icon: "icons/firewall.svg", desc: "Web Application Security Testing" },
+        { name: "Metasploit Framework", icon: "icons/terminal.svg", desc: "Penetration Testing Platform" },
+        { name: "System Settings", icon: "icons/sys_settings.svg", desc: "Configure Hardware & Display" },
+        { name: "Package Manager", icon: "icons/package.svg", desc: "Arch Linux Pacman / AUR" },
+        { name: "About System", icon: "icons/sys_about.svg", desc: "OS & Kernel Information" }
+      ]
+    };
+
+    let activeFilter = 'All';
+
+    window.setSearchFilter = function(filter) {
+      activeFilter = filter;
+      ['All', 'Apps', 'Files', 'Tools'].forEach(f => {
+        const btn = document.getElementById('sf' + f);
+        if (btn) btn.classList.toggle('active', f === filter);
+      });
+      const colApps = document.getElementById('searchColApps');
+      const colFiles = document.getElementById('searchColFiles');
+      const colTools = document.getElementById('searchColTools');
+      if (colApps) colApps.style.display = (filter === 'All' || filter === 'Apps') ? 'flex' : 'none';
+      if (colFiles) colFiles.style.display = (filter === 'All' || filter === 'Files') ? 'flex' : 'none';
+      if (colTools) colTools.style.display = (filter === 'All' || filter === 'Tools') ? 'flex' : 'none';
+    };
+
+    const searchInput = document.getElementById('searchInputPreview');
+    const instantSearchView = document.getElementById('instantSearchView');
+    const pinnedSection = document.getElementById('pinnedSection');
+    const recommendedSection = document.getElementById('recommendedSection');
+    const allAppsView = document.getElementById('allAppsView');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        if (q.length === 0) {
+          if (instantSearchView) instantSearchView.style.display = 'none';
+          if (pinnedSection) pinnedSection.style.display = 'flex';
+          if (recommendedSection) recommendedSection.style.display = 'flex';
+          return;
+        }
+
+        if (instantSearchView) instantSearchView.style.display = 'flex';
+        if (pinnedSection) pinnedSection.style.display = 'none';
+        if (recommendedSection) recommendedSection.style.display = 'none';
+        if (allAppsView) allAppsView.style.display = 'none';
+
+        const matchedApps = previewDb.apps.filter(a => a.name.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));
+        const matchedFiles = previewDb.files.filter(f => f.name.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q));
+        const matchedTools = previewDb.tools.filter(t => t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q));
+
+        document.getElementById('countApps').innerText = matchedApps.length;
+        document.getElementById('countFiles').innerText = matchedFiles.length;
+        document.getElementById('countTools').innerText = matchedTools.length;
+
+        const renderItem = (item) => `
+          <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: 0.1s; background: rgba(255,255,255,0.03);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+            <img src="${item.icon}" style="width: 22px; height: 22px; object-fit: contain;">
+            <div style="display: flex; flex-direction: column; overflow: hidden;">
+              <span style="font-size: 11px; font-weight: 600; color: white; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${item.name}</span>
+              <span style="font-size: 9px; color: #9aa3b2; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${item.desc}</span>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('listApps').innerHTML = matchedApps.map(renderItem).join('') || '<div style="font-size: 11px; color: #6e7681; padding: 8px;">No apps found</div>';
+        document.getElementById('listFiles').innerHTML = matchedFiles.map(renderItem).join('') || '<div style="font-size: 11px; color: #6e7681; padding: 8px;">No files found</div>';
+        document.getElementById('listTools').innerHTML = matchedTools.map(renderItem).join('') || '<div style="font-size: 11px; color: #6e7681; padding: 8px;">No tools found</div>';
+      });
+    }
+
+</script>
 </body>
 
 </html>

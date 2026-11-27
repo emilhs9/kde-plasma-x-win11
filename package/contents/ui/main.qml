@@ -1,3 +1,4 @@
+import "search_db.js" as SearchDB
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
@@ -257,6 +258,51 @@ PlasmoidItem {
                 property bool showMorePinned: false
                 property bool isDraggingAny: false
 
+                // Instant Multi-Category Search Models
+                ListModel { id: searchAppsModel }
+                ListModel { id: searchFilesModel }
+                ListModel { id: searchToolsModel }
+                property string activeSearchFilter: "All"
+                property var selectedSearchItem: null
+
+                function performInstantSearch(query) {
+                    var q = query.trim().toLowerCase();
+                    searchAppsModel.clear();
+                    searchFilesModel.clear();
+                    searchToolsModel.clear();
+                    selectedSearchItem = null;
+
+                    if (q.length === 0) return;
+
+                    var apps = SearchDB.searchDb.apps || [];
+                    for (var i = 0; i < apps.length; i++) {
+                        var a = apps[i];
+                        if (a.name.toLowerCase().indexOf(q) !== -1 || a.desc.toLowerCase().indexOf(q) !== -1 || a.category.toLowerCase().indexOf(q) !== -1) {
+                            searchAppsModel.append(a);
+                            if (!selectedSearchItem) selectedSearchItem = a;
+                        }
+                    }
+
+                    var files = SearchDB.searchDb.files || [];
+                    for (var j = 0; j < files.length; j++) {
+                        var fl = files[j];
+                        if (fl.name.toLowerCase().indexOf(q) !== -1 || fl.desc.toLowerCase().indexOf(q) !== -1 || fl.location.toLowerCase().indexOf(q) !== -1) {
+                            searchFilesModel.append(fl);
+                            if (!selectedSearchItem) selectedSearchItem = fl;
+                        }
+                    }
+
+                    var tools = SearchDB.searchDb.tools || [];
+                    for (var k = 0; k < tools.length; k++) {
+                        var t = tools[k];
+                        if (t.name.toLowerCase().indexOf(q) !== -1 || t.desc.toLowerCase().indexOf(q) !== -1 || t.category.toLowerCase().indexOf(q) !== -1) {
+                            searchToolsModel.append(t);
+                            if (!selectedSearchItem) selectedSearchItem = t;
+                        }
+                    }
+                }
+
+
                 Keys.onEscapePressed: popDialog.requestClose()
 
                 // Catch any typing anywhere in the menu and route directly to searchInput
@@ -491,10 +537,14 @@ PlasmoidItem {
                                         font.family: "Segoe UI"
                                         background: Item {}
                                         onTextChanged: {
+                                            fullScope.performInstantSearch(text);
                                             runnerModel.query = text;
                                         }
                                         Keys.onReturnPressed: {
-                                            if (runnerModel.count > 0) {
+                                            if (fullScope.selectedSearchItem) {
+                                                root.launchCommand(fullScope.selectedSearchItem.cmd);
+                                                popDialog.requestClose();
+                                            } else if (runnerModel.count > 0) {
                                                 runnerModel.trigger(0, "", null);
                                                 popDialog.requestClose();
                                             }
@@ -532,46 +582,291 @@ PlasmoidItem {
                                     color: Qt.rgba(1, 1, 1, 0.1)
                                 }
 
-                                // Search Results View
-                                ListView {
+                                // Windows 11 Full 3-Column Search Results View (Apps, Files, Tools) + Live Instant Preview
+                                Item {
                                     anchors.fill: parent
-                                    anchors.leftMargin: 24
+                                    anchors.leftMargin: 20
                                     anchors.rightMargin: 20
                                     visible: fullScope.isSearching
-                                    clip: true
-                                    model: runnerModel
-                                    delegate: Rectangle {
-                                        width: ListView.view.width
-                                        height: 44
-                                        radius: 6
-                                        color: rMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : "transparent"
 
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        spacing: 10
+
+                                        // Category Filter Chips (All, Apps, Files, Tools)
                                         RowLayout {
-                                            anchors.fill: parent
-                                            anchors.leftMargin: 10
-                                            anchors.rightMargin: 10
+                                            Layout.fillWidth: true
+                                            spacing: 6
+
+                                            Repeater {
+                                                model: ["All", "Apps", "Files", "Tools"]
+                                                Rectangle {
+                                                    required property string modelData
+                                                    height: 24
+                                                    radius: 12
+                                                    width: filterChipText.implicitWidth + 20
+                                                    color: fullScope.activeSearchFilter === modelData ? "#0078d4" : (chipHover.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.07))
+                                                    border.color: fullScope.activeSearchFilter === modelData ? "#2d9aff" : Qt.rgba(1, 1, 1, 0.15)
+
+                                                    Text {
+                                                        id: filterChipText
+                                                        anchors.centerIn: parent
+                                                        text: parent.modelData
+                                                        color: "white"
+                                                        font.pixelSize: 11
+                                                        font.weight: fullScope.activeSearchFilter === parent.modelData ? Font.DemiBold : Font.Normal
+                                                    }
+
+                                                    MouseArea {
+                                                        id: chipHover
+                                                        anchors.fill: parent
+                                                        hoverEnabled: true
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: fullScope.activeSearchFilter = parent.modelData
+                                                    }
+                                                }
+                                            }
+                                            Item { Layout.fillWidth: true }
+                                        }
+
+                                        // 3-Column Split or Multi-Category Grid
+                                        RowLayout {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
                                             spacing: 12
 
-                                            Kirigami.Icon {
-                                                source: model.icon || "application-x-executable"
-                                                Layout.preferredWidth: 26
-                                                Layout.preferredHeight: 26
-                                            }
-                                            Text {
-                                                text: model.display || ""
-                                                color: "white"
-                                                font.pixelSize: 12
-                                                elide: Text.ElideRight
+                                            // Column 1: Applications (Apps)
+                                            ColumnLayout {
                                                 Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.preferredWidth: 1
+                                                visible: fullScope.activeSearchFilter === "All" || fullScope.activeSearchFilter === "Apps"
+                                                spacing: 6
+
+                                                RowLayout {
+                                                    Layout.fillWidth: true
+                                                    Text {
+                                                        text: "APPS (" + searchAppsModel.count + ")"
+                                                        color: "#79c0ff"
+                                                        font.pixelSize: 10
+                                                        font.weight: Font.Bold
+                                                    }
+                                                }
+
+                                                ListView {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    clip: true
+                                                    model: searchAppsModel
+                                                    spacing: 4
+                                                    delegate: Rectangle {
+                                                        width: ListView.view.width
+                                                        height: 40
+                                                        radius: 6
+                                                        color: (fullScope.selectedSearchItem && fullScope.selectedSearchItem.name === model.name) ? Qt.rgba(0, 0.47, 0.83, 0.35) : (appItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent")
+                                                        border.color: (fullScope.selectedSearchItem && fullScope.selectedSearchItem.name === model.name) ? "#0078d4" : "transparent"
+
+                                                        RowLayout {
+                                                            anchors.fill: parent
+                                                            anchors.leftMargin: 8
+                                                            anchors.rightMargin: 8
+                                                            spacing: 8
+
+                                                            Kirigami.Icon {
+                                                                source: model.icon || "application-x-executable"
+                                                                Layout.preferredWidth: 22
+                                                                Layout.preferredHeight: 22
+                                                            }
+                                                            ColumnLayout {
+                                                                Layout.fillWidth: true
+                                                                spacing: 1
+                                                                Text {
+                                                                    text: model.name
+                                                                    color: "white"
+                                                                    font.pixelSize: 11
+                                                                    font.weight: Font.Medium
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                                Text {
+                                                                    text: model.desc
+                                                                    color: "#9aa3b2"
+                                                                    font.pixelSize: 9
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: appItemMouse
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onEntered: fullScope.selectedSearchItem = model
+                                                            onClicked: {
+                                                                root.launchCommand(model.cmd);
+                                                                popDialog.requestClose();
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
-                                        }
-                                        MouseArea {
-                                            id: rMouse
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            onClicked: {
-                                                runnerModel.trigger(index, "", null);
-                                                popDialog.requestClose();
+
+                                            // Column 2: Files & Documents
+                                            ColumnLayout {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.preferredWidth: 1
+                                                visible: fullScope.activeSearchFilter === "All" || fullScope.activeSearchFilter === "Files"
+                                                spacing: 6
+
+                                                RowLayout {
+                                                    Layout.fillWidth: true
+                                                    Text {
+                                                        text: "FILES (" + searchFilesModel.count + ")"
+                                                        color: "#7ee787"
+                                                        font.pixelSize: 10
+                                                        font.weight: Font.Bold
+                                                    }
+                                                }
+
+                                                ListView {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    clip: true
+                                                    model: searchFilesModel
+                                                    spacing: 4
+                                                    delegate: Rectangle {
+                                                        width: ListView.view.width
+                                                        height: 40
+                                                        radius: 6
+                                                        color: (fullScope.selectedSearchItem && fullScope.selectedSearchItem.name === model.name) ? Qt.rgba(0, 0.47, 0.83, 0.35) : (fileItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent")
+                                                        border.color: (fullScope.selectedSearchItem && fullScope.selectedSearchItem.name === model.name) ? "#0078d4" : "transparent"
+
+                                                        RowLayout {
+                                                            anchors.fill: parent
+                                                            anchors.leftMargin: 8
+                                                            anchors.rightMargin: 8
+                                                            spacing: 8
+
+                                                            Kirigami.Icon {
+                                                                source: model.icon || "text-plain"
+                                                                Layout.preferredWidth: 22
+                                                                Layout.preferredHeight: 22
+                                                            }
+                                                            ColumnLayout {
+                                                                Layout.fillWidth: true
+                                                                spacing: 1
+                                                                Text {
+                                                                    text: model.name
+                                                                    color: "white"
+                                                                    font.pixelSize: 11
+                                                                    font.weight: Font.Medium
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                                Text {
+                                                                    text: model.desc
+                                                                    color: "#9aa3b2"
+                                                                    font.pixelSize: 9
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: fileItemMouse
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onEntered: fullScope.selectedSearchItem = model
+                                                            onClicked: {
+                                                                root.launchCommand(model.cmd);
+                                                                popDialog.requestClose();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            // Column 3: Tools & Settings
+                                            ColumnLayout {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.preferredWidth: 1
+                                                visible: fullScope.activeSearchFilter === "All" || fullScope.activeSearchFilter === "Tools"
+                                                spacing: 6
+
+                                                RowLayout {
+                                                    Layout.fillWidth: true
+                                                    Text {
+                                                        text: "TOOLS (" + searchToolsModel.count + ")"
+                                                        color: "#d2a8ff"
+                                                        font.pixelSize: 10
+                                                        font.weight: Font.Bold
+                                                    }
+                                                }
+
+                                                ListView {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    clip: true
+                                                    model: searchToolsModel
+                                                    spacing: 4
+                                                    delegate: Rectangle {
+                                                        width: ListView.view.width
+                                                        height: 40
+                                                        radius: 6
+                                                        color: (fullScope.selectedSearchItem && fullScope.selectedSearchItem.name === model.name) ? Qt.rgba(0, 0.47, 0.83, 0.35) : (toolItemMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent")
+                                                        border.color: (fullScope.selectedSearchItem && fullScope.selectedSearchItem.name === model.name) ? "#0078d4" : "transparent"
+
+                                                        RowLayout {
+                                                            anchors.fill: parent
+                                                            anchors.leftMargin: 8
+                                                            anchors.rightMargin: 8
+                                                            spacing: 8
+
+                                                            Kirigami.Icon {
+                                                                source: model.icon || "preferences-system"
+                                                                Layout.preferredWidth: 22
+                                                                Layout.preferredHeight: 22
+                                                            }
+                                                            ColumnLayout {
+                                                                Layout.fillWidth: true
+                                                                spacing: 1
+                                                                Text {
+                                                                    text: model.name
+                                                                    color: "white"
+                                                                    font.pixelSize: 11
+                                                                    font.weight: Font.Medium
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                                Text {
+                                                                    text: model.desc
+                                                                    color: "#9aa3b2"
+                                                                    font.pixelSize: 9
+                                                                    elide: Text.ElideRight
+                                                                    Layout.fillWidth: true
+                                                                }
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: toolItemMouse
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onEntered: fullScope.selectedSearchItem = model
+                                                            onClicked: {
+                                                                root.launchCommand(model.cmd);
+                                                                popDialog.requestClose();
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
