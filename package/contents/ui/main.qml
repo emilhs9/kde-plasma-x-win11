@@ -108,6 +108,12 @@ PlasmoidItem {
 
     property QtObject dialogWindow: null
 
+    onScreenGeometryChanged: {
+        if (dialogWindow && dialogWindow.visible) {
+            dialogWindow.updatePosition();
+        }
+    }
+
     Component.onCompleted: {
         dialogWindow = menuDialogComponent.createObject(root);
         plasmoid.activated.connect(function() {
@@ -193,6 +199,7 @@ PlasmoidItem {
                     resetState();
                 }
                 isClosing = false;
+                updatePosition();
                 visible = true;
                 requestActivate();
                 fullScope.forceActiveFocus();
@@ -216,21 +223,32 @@ PlasmoidItem {
                 }
             }
 
+            function updatePosition() {
+                var screen = root.screenGeometry;
+                var appletGlobal = root.mapToGlobal(0, 0);
+
+                // Fallback geometry if screen is not yet initialized right after reboot
+                var sWidth = (screen && screen.width > 0) ? screen.width : 1920;
+                var sHeight = (screen && screen.height > 0) ? screen.height : 1080;
+                var sX = (screen && typeof screen.x !== "undefined") ? screen.x : 0;
+                var sY = (screen && typeof screen.y !== "undefined") ? screen.y : 0;
+
+                // Position X: Centered with 10px shift to the right matching taskbar
+                var targetX = sX + Math.round((sWidth - width) / 2) + 10;
+
+                // Position Y: Exactly above the bottom panel with 5px margin
+                var appletY = (appletGlobal && typeof appletGlobal.y !== "undefined" && appletGlobal.y > 0) ? appletGlobal.y : (sY + sHeight - 48);
+                var targetY = appletY - height - 5;
+                if (targetY < sY + 12) targetY = sY + 12;
+
+                x = targetX;
+                y = targetY;
+            }
+
             onVisibleChanged: {
                 if (visible) {
                     isClosing = false;
-                    var screen = root.screenGeometry;
-                    var appletGlobal = root.mapToGlobal(0, 0);
-
-                    // Position X: Centered with 10px shift to the right
-                    var targetX = screen.x + (screen.width - width) / 2 + 10;
-
-                    // Position Y: Exactly above the bottom panel with 5px margin
-                    var targetY = appletGlobal.y - height - 5;
-                    if (targetY < screen.y + 12) targetY = screen.y + 12;
-
-                    x = targetX;
-                    y = targetY;
+                    updatePosition();
 
                     // Straight vertical 140ms opening animation
                     containerRect.opacity = 0.0;
