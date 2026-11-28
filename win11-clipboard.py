@@ -552,41 +552,47 @@ class Win11ClipboardWindow(QWidget):
             """)
 
     def load_history(self):
+        import json
         while self.cards_layout.count() > 1:
             child = self.cards_layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
+        script = """
+        var res = [];
+        var n = Math.min(count(), 40);
+        for (var i = 0; i < n; i++) {
+            var isPin = plugins.itempinned.isPinned(i);
+            var m = str(read('?', i));
+            var isImg = m.indexOf('image/png') !== -1;
+            var txt = isImg ? '' : str(read('text/plain', i));
+            res.push({ i: i, pinned: isPin, isImg: isImg, text: txt });
+        }
+        print(JSON.stringify(res));
+        """
         try:
-            count_out = subprocess.check_output(['copyq', 'count']).decode().strip()
-            count = int(count_out or '0')
+            out = subprocess.check_output(['copyq', 'eval', script]).decode('utf-8', errors='ignore')
+            items = json.loads(out)
         except Exception:
-            count = 0
+            items = []
 
-        if count == 0:
-            empty_lbl = QLabel("Nothing here\nYou'll see your clipboard history here once you've copied something.")
+        if not items:
+            empty_lbl = QLabel("Nothing here\\nYou'll see your clipboard history here once you've copied something.")
             empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             empty_lbl.setStyleSheet("color: #888888; font-size: 13px; padding-top: 80px;")
             self.cards_layout.insertWidget(0, empty_lbl)
             return
 
-        for i in range(min(count, 50)):
-            try:
-                # Check if pinned
-                pinned_res = subprocess.check_output(
-                    ['copyq', 'eval', f'plugins.itempinned.isPinned({i})'],
-                    stderr=subprocess.DEVNULL
-                ).decode().strip()
-                is_pinned = (pinned_res.lower() == 'true')
-
-                mimes = subprocess.check_output(['copyq', 'read', '?', str(i)]).decode('utf-8', errors='ignore')
-                
-                if 'image/png' in mimes:
-                    raw_img = subprocess.check_output(['copyq', 'read', 'image/png', str(i)])
+        for item in items:
+            idx = item['i']
+            is_pinned = item.get('pinned', False)
+            if item.get('isImg'):
+                try:
+                    raw_img = subprocess.check_output(['copyq', 'read', 'image/png', str(idx)])
                     img = QImage.fromData(raw_img)
                     pixmap = QPixmap.fromImage(img)
                     card = ClipboardCard(
-                        i,
+                        idx,
                         pixmap=pixmap,
                         raw_image_bytes=raw_img,
                         is_pinned=is_pinned,
@@ -595,20 +601,18 @@ class Win11ClipboardWindow(QWidget):
                         on_toggle_pin=self.on_toggle_pin
                     )
                     self.cards_layout.insertWidget(self.cards_layout.count() - 1, card)
-                elif 'text/plain' in mimes:
-                    text = subprocess.check_output(['copyq', 'read', 'text/plain', str(i)]).decode('utf-8', errors='replace').strip()
-                    if text:
-                        card = ClipboardCard(
-                            i,
-                            text=text,
-                            is_pinned=is_pinned,
-                            on_paste=self.on_card_paste,
-                            on_delete=self.on_card_delete,
-                            on_toggle_pin=self.on_toggle_pin
-                        )
-                        self.cards_layout.insertWidget(self.cards_layout.count() - 1, card)
-            except Exception:
-                continue
+                except Exception:
+                    pass
+            elif item.get('text'):
+                card = ClipboardCard(
+                    idx,
+                    text=item['text'],
+                    is_pinned=is_pinned,
+                    on_paste=self.on_card_paste,
+                    on_delete=self.on_card_delete,
+                    on_toggle_pin=self.on_toggle_pin
+                )
+                self.cards_layout.insertWidget(self.cards_layout.count() - 1, card)
 
     def on_card_paste(self, index, text, raw_image_bytes):
         try:
@@ -668,10 +672,9 @@ class Win11ClipboardWindow(QWidget):
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.ActivationChange:
-            if self.isActiveWindow():
-                self.was_active = True
-            elif getattr(self, 'was_active', False):
-                self.close()
+            if time.time() - getattr(self, 'shown_time', 0) > 1.2:
+                if not self.isActiveWindow():
+                    self.close()
         super().changeEvent(event)
 
 import atexit
