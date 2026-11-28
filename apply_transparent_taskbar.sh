@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Script: 100% Clear Invisible Taskbar (Exact TranslucentTB Clear style)
-# Windows 11 ayna kimi tam şəffaf (Blur yoxdur, arxası 100% aydın və net görünür)
+# Script: Black Translucent Taskbar (Qara, arxası görünən)
 # ==============================================================================
 set -e
 
@@ -10,8 +9,7 @@ WIDGETS_DIR="$THEME_DIR/widgets"
 mkdir -p "$WIDGETS_DIR"
 
 python3 -c "
-import os, gzip, re, json
-import xml.etree.ElementTree as ET
+import os, gzip, xml.etree.ElementTree as ET, json
 
 theme_dir = os.path.expanduser('~/.local/share/plasma/desktoptheme/Breeze-Transparent')
 widgets_dir = os.path.join(theme_dir, 'widgets')
@@ -21,7 +19,7 @@ metadata = {
     'KPlugin': {
         'Authors': [{'Name': 'KDE Visual Design Group'}],
         'Category': '',
-        'Description': 'Breeze with 100% Clear Invisible taskbar like Windows 11 TranslucentTB',
+        'Description': 'Breeze with Black Translucent taskbar',
         'EnabledByDefault': True,
         'Id': 'Breeze-Transparent',
         'License': 'LGPL',
@@ -35,40 +33,33 @@ with open(os.path.join(theme_dir, 'metadata.json'), 'w') as f:
     json.dump(metadata, f, indent=4)
 
 with gzip.open('/usr/share/plasma/desktoptheme/default/widgets/panel-background.svgz', 'rb') as f:
-    svg_raw = f.read().decode('utf-8', errors='ignore')
+    xml_str = f.read().decode('utf-8', errors='ignore')
 
-# Set all styles to completely transparent & no fill
-svg_clear = re.sub(r'style=\"[^\"]*(?:opacity|fill)[^\"]*\"', 'style=\"opacity:0;fill:none;\"', svg_raw)
+root = ET.fromstring(xml_str)
 
-root = ET.fromstring(svg_clear)
+for elem in root.iter():
+    elem_id = elem.attrib.get('id', '')
+    if 'mask' in elem_id:
+        elem.attrib['style'] = 'fill:#000000;fill-opacity:1;opacity:1;'
+        if 'class' in elem.attrib: del elem.attrib['class']
+    elif elem_id in ['rect4138', 'center', 'rect4152', 'top', 'rect4148', 'bottom', 'rect4144', 'left', 'rect4140', 'right', 'topleft', 'topright', 'bottomleft', 'bottomright', 'path3115', 'path3118', 'path3124', 'path3121']:
+        elem.attrib['style'] = 'fill:#000000;fill-opacity:0.50;opacity:1;'
+        if 'class' in elem.attrib: del elem.attrib['class']
+    elif elem_id in ['path1337', 'path1671', 'path1785', 'path1902']:
+        elem.attrib['style'] = 'fill:#000000;fill-opacity:0.50;opacity:1;'
+        if 'class' in elem.attrib: del elem.attrib['class']
+    elif 'shadow' in elem_id and not elem_id.startswith('shadow-hint'):
+        elem.attrib['style'] = 'opacity:0;fill:none;'
 
-# KWin blur effekti mask-* elementlərini oxuyub arxasını dumanlı/bulanıq edir.
-# Tam ayna kimi kristal şəffaflıq üçün mask-* elementlərini tam silirik:
-for el in root.iter():
-    for child in list(el):
-        child_id = child.attrib.get('id', '')
-        if child_id.startswith('mask-'):
-            el.remove(child)
+xml_out = ET.tostring(root, encoding='unicode')
+with open(os.path.join(widgets_dir, 'panel-background.svg'), 'w') as f:
+    f.write(xml_out)
 
-tree = ET.ElementTree(root)
-tree.write(os.path.join(widgets_dir, 'panel-background.svg'), encoding='utf-8', xml_declaration=True)
-
-print('[✓] 100% Clear panel-background.svg generated (no blur masks, no fills, no shadows)')
+print('[✓] Black translucent panel-background.svg generated')
 "
 
-# Set flat bottom dock (not floating, zero gap)
 kwriteconfig6 --file plasma-org.kde.plasma.desktop-appletsrc --group Containments --group 2 --key floating 0
-
-# Set panelVisibility=3 (WindowsGoBelow - pəncərələr panelin tam altına keçir, kəsilmə olmur)
-kwriteconfig6 --file plasma-org.kde.plasma.desktop-appletsrc --group Containments --group 2 --key panelVisibility 3
-
-# Apply Breeze-Transparent theme
 kwriteconfig6 --file plasmarc --group Theme --key name Breeze-Transparent
-
-# Clear plasma SVG cache
-rm -f "$HOME/.cache/plasma_theme_"*.kcache
-
-# Restart plasma shell
 systemctl --user restart plasma-plasmashell.service
 
-echo "[✓] Taskbar şəkildəki kimi 100% tam şəffaf və ayna kimi edildi!"
+echo "[✓] Qara, arxası görünən taskbar tətbiq edildi!"
